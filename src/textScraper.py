@@ -1,9 +1,10 @@
 import itertools
-import urllib.request
+import urllib
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import os
+import datetime
 
 listOfMinutesURLs = [
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141217.htm",
@@ -45,11 +46,11 @@ listOfMinutesURLs = [
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180613.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180502.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180321.htm",
-  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180131.htm",
-  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20190130.htm"]
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180131.htm"
+  ]
 
 
-listOfStmtURLs = {
+listOfStmtURLs = [
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20141217a.htm",
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20141029a.htm",
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20140917a.htm",
@@ -88,23 +89,17 @@ listOfStmtURLs = {
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180801a.htm",
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180613a.htm",
   "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180502a.htm",
-  "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180321a.htm",
-  "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180131a.htm",
-  "https://www.federalreserve.gov/newsevents/pressreleases/monetary20190320a.htm",
-  "https://www.federalreserve.gov/newsevents/pressreleases/monetary20190130a.htm"
-}
+  "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180321a.htm"
+]
 
-response =  urllib.request.urlopen('https://www.federalreserve.gov/newsevents/pressreleases/monetary20140129a.htm')
-html = response.read()
-soup = BeautifulSoup(html,'html5lib')
-text2 = soup.get_text(strip = True)
-text2= text2[text2.find('For immediate releaseShare')+26:]
-text2=text2[:text2.index("Last Update:")+100]
+#Change relative directory
+os.chdir("..")
+os.chdir(os.path.abspath(os.curdir)+"/text")
 
 
 ##Minute Text Retrieval
-for x in listOfMinutesURLs:
-  response = urllib.request.urlopen(x)
+for index,x in enumerate(listOfMinutesURLs):
+  response = urllib.request.urlopen(listOfMinutesURLs[index])
   html = response.read()
   soup = BeautifulSoup(html,'html5lib')
   text2 = soup.get_text(strip = True)
@@ -116,19 +111,16 @@ for x in listOfMinutesURLs:
   print(publish_date)
   start = 'adjourned at'
   end = 'notation vote'
-  if text2.rfind(end) == False:
-    print("no time")
-  else: 
-    meeting_date = (text2[text2.find(start)+len(start):text2.rfind(end)-17]).strip()
-    if len(meeting_date) > 75: 
-      print("problem")
-    else: 
-      print(meeting_date)
-  print("\n")
+  prog = re.compile('\d{4}\d{2}\d{2}')
+  dateOfText=re.findall(prog,listOfMinutesURLs[index])
+  publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+  text_file = open(os.getcwd()+"/minutes/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
+  text_file.write(text2)
+  text_file.close()
 
 ##Statement Text Retrieval
-for x in listOfStmtURLs:
-  response = urllib.request.urlopen(x)
+for index,x in enumerate(listOfStmtURLs):
+  response = urllib.request.urlopen(listOfStmtURLs[index])
   html = response.read()
   soup = BeautifulSoup(html,'html5lib')
   text2 = soup.get_text(strip = True)
@@ -138,13 +130,25 @@ for x in listOfStmtURLs:
   end = 'Board of Gov'
   meeting_date = text2[text2.find(start)+len(start):text2.rfind(end)].strip()
   print(meeting_date)
+  start = 'adjourned at'
+  end = 'notation vote'
+  prog = re.compile('\d{4}\d{2}\d{2}')
+  dateOfText=re.findall(prog,listOfStmtURLs[index])
+  text_file = open(os.getcwd()+"/statements/"+dateOfText[0]+".txt","w")
+  text_file.write(text2)
+  text_file.close()
 
   
 
 #get a list of URLS of Governors speeches for a given year
 #Scrape the dates and names from the website for a given year
 
-listOfYears = ['2014','2015','2016','2017','2018','2019']
+listOfYears = ['2014','2015','2016']
+
+#2014 and 2015 need to be evaluated manually 
+search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard','clarida','stein']
+
+
 
 for year in listOfYears:
   #Build list of dates
@@ -156,31 +160,34 @@ for year in listOfYears:
   text2 = soup.get_text(strip = True)
   date_reg_exp = re.compile('\d{2}/\d{2}/\d{4}')
   date_matches_list=date_reg_exp.findall(text2)
-
   #Build list of names
-  search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard','clarida','stein']
   long_string = text2
   names_reg_Ex = re.compile('|'.join(search_list),re.IGNORECASE) #re.IGNORECASE is used to ignore case
   name_matches_list = names_reg_Ex.findall(text2)
-
   #Combine the two
-  for index, match in enumerate(date_matches_list):
-    date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
-    urls.append('https://www.federalreserve.gov/newsevents/speech/'+name_matches_list[index].lower()+date_matches_list[index]+'a.htm')
-    #date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d") 
+  for idex, match in enumerate(date_matches_list):
+    for jdex, speaker in enumerate(search_list):
+      try:
+        date_matches_list[idex] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
+        urlCall = 'https://www.federalreserve.gov/newsevents/speech/'+search_list[jdex].lower()+date_matches_list[idex]+'a.htm'
+        print(urlCall)
+        response = urllib.request.urlopen(urlCall)
+        html = response.read()
+        soup = BeautifulSoup(html,'html5lib')
+        text2 = soup.get_text(strip = True)
+        text2= text2[text2.find("Share"):]
+        text2=text2[:text2.index("Last Update:")]
+        text_file = open(os.getcwd()+"/text/speeches/"+date_matches_list[idex]+"_"+name_matches_list[idex].lower()+".txt","w")
+        text_file.write(text2)
+        text_file.close()
+        print(idex)
+        break
+      except HTTPError as e:
+        print('Error code: ', e.code)
+      except URLError as e:
+        print('Reason: ', e.reason)
 
-  #Get Text from website, save to a folder
-  for index, item in enumerate(urls):
-    response = urllib.request.urlopen(item)
-    html = response.read()
-    soup = BeautifulSoup(html,'html5lib')
-    text2 = soup.get_text(strip = True)
-    text2= text2[text2.find("Share"):]
-    text2=text2[:text2.index("Last Update:")]
-    text_file = open(os.getcwd()+"/text/speeches/"+date_matches_list[index]+"_"+name_matches_list[index].lower()+".txt","w")
-    text_file.write(text2)
-    text_file.close()
-    print(index)
+
 
 
 ###Scratch Code:
@@ -236,3 +243,12 @@ for year in listOfYears:
 
 #for item in itertools.chain(date_matches_list, name_matches_list):
 #  print(item)
+
+
+
+#response =  urllib.request.urlopen('https://www.federalreserve.gov/newsevents/pressreleases/monetary20140129a.htm')
+#html = response.read()
+#soup = BeautifulSoup(html,'html5lib')
+#text2 = soup.get_text(strip = True)
+#text2= text2[text2.find('For immediate releaseShare')+26:]
+#text2=text2[:text2.index("Last Update:")+100]
