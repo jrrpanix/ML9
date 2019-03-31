@@ -160,6 +160,7 @@ def retrieveSpeeches():
           html = response.read()
           soup = BeautifulSoup(html,'html5lib')
           text2 = soup.get_text(strip = True)
+          text2= text2[text2.find("Please enable JavaScript if it is disabled in your browser or access the information through the links provided below"):]
           text2= text2[text2.find("Share"):]
           text2=text2[:text2.index("Last Update:")]
           text_file = open(os.getcwd()+"/speeches/"+date_matches_list[idex]+"_"+name_matches_list[idex].lower()+".txt","w")
@@ -179,9 +180,9 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  retrieveStatements()
+  #retrieveStatements()
   #retrieveMinutes()
-  #retrieveSpeeches()
+  retrieveSpeeches()
   
 if __name__ == '__main__':
   main()
