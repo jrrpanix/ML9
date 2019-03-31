@@ -123,14 +123,8 @@ def retrieveStatements():
     html = response.read()
     soup = BeautifulSoup(html,'html5lib')
     text2 = soup.get_text(strip = True)
-    text2= text2[text2.find("Share"):]
-    text2=text2[:text2.index("Last Update:")+100]
-    start = 'Last Update:'
-    end = 'Board of Gov'
-    meeting_date = text2[text2.find(start)+len(start):text2.rfind(end)].strip()
-    print(meeting_date)
-    start = 'adjourned at'
-    end = 'notation vote'
+    text2= text2[text2.find("Information received since"):]
+    text2=text2[:text2.index("Last Update:")]
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfStmtURLs[index])
     text_file = open(os.getcwd()+"/statements/"+dateOfText[0]+".txt","w")
@@ -186,8 +180,8 @@ def main():
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
   retrieveStatements()
-  retrieveMinutes()
-  retrieveSpeeches()
+  #retrieveMinutes()
+  #retrieveSpeeches()
   
 if __name__ == '__main__':
   main()
