@@ -3,6 +3,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
+import os
 
 listOfMinutesURLs = [
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141217.htm",
@@ -143,36 +144,43 @@ for x in listOfStmtURLs:
 #get a list of URLS of Governors speeches for a given year
 #Scrape the dates and names from the website for a given year
 
-#Build list of dates
-urls = list()
-response =  urllib.request.urlopen('https://www.federalreserve.gov/newsevents/speech/2017-speeches.htm')
-html = response.read()
-soup = BeautifulSoup(html,'html5lib')
-text2 = soup.get_text(strip = True)
-date_reg_exp = re.compile('\d{2}/\d{2}/\d{4}')
-date_matches_list=date_reg_exp.findall(text2)
+listOfYears = ['2014','2015','2016','2017','2018','2019']
 
-#Build list of names
-search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard']
-long_string = text2
-names_reg_Ex = re.compile('|'.join(search_list),re.IGNORECASE) #re.IGNORECASE is used to ignore case
-name_matches_list = names_reg_Ex.findall(text2)
-
-#Combine the two
-for index, match in enumerate(date_matches_list):
-  date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
-  urls.append('https://www.federalreserve.gov/newsevents/speech/'+name_matches_list[index].lower()+date_matches_list[index]+'a.htm')
-  #date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d") 
-
-#Get Text from website, save to a folder
-for item in urls:
-  response = urllib.request.urlopen(item)
+for year in listOfYears:
+  #Build list of dates
+  urls = list()
+  speechYearUrl = "https://www.federalreserve.gov/newsevents/speech/"+year+"-speeches.htm"
+  response =  urllib.request.urlopen(speechYearUrl)
   html = response.read()
   soup = BeautifulSoup(html,'html5lib')
   text2 = soup.get_text(strip = True)
-  text2= text2[text2.find("Share"):]
-  text2=text2[:text2.index("Last Update:")]
-  
+  date_reg_exp = re.compile('\d{2}/\d{2}/\d{4}')
+  date_matches_list=date_reg_exp.findall(text2)
+
+  #Build list of names
+  search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard','clarida','stein']
+  long_string = text2
+  names_reg_Ex = re.compile('|'.join(search_list),re.IGNORECASE) #re.IGNORECASE is used to ignore case
+  name_matches_list = names_reg_Ex.findall(text2)
+
+  #Combine the two
+  for index, match in enumerate(date_matches_list):
+    date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
+    urls.append('https://www.federalreserve.gov/newsevents/speech/'+name_matches_list[index].lower()+date_matches_list[index]+'a.htm')
+    #date_matches_list[index] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d") 
+
+  #Get Text from website, save to a folder
+  for index, item in enumerate(urls):
+    response = urllib.request.urlopen(item)
+    html = response.read()
+    soup = BeautifulSoup(html,'html5lib')
+    text2 = soup.get_text(strip = True)
+    text2= text2[text2.find("Share"):]
+    text2=text2[:text2.index("Last Update:")]
+    text_file = open(os.getcwd()+"/text/speeches/"+date_matches_list[index]+"_"+name_matches_list[index].lower()+".txt","w")
+    text_file.write(text2)
+    text_file.close()
+    print(index)
 
 
 ###Scratch Code:
