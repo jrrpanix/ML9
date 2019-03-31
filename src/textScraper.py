@@ -64,8 +64,7 @@ def retrieveMinutes():
     end = 'Board of Gov'
     publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
     print(publish_date)
-    start = 'adjourned at'
-    end = 'notation vote'
+    text2 = text2[:text2.index("Secretary")]
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfMinutesURLs[index])
     publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
@@ -163,6 +162,8 @@ def retrieveSpeeches():
           text2= text2[text2.find("Please enable JavaScript if it is disabled in your browser or access the information through the links provided below"):]
           text2= text2[text2.find("Share"):]
           text2=text2[:text2.index("Last Update:")]
+          if text2.find("1.") != -1:
+            text2=text2[:text2.find("1.")]
           text_file = open(os.getcwd()+"/speeches/"+date_matches_list[idex]+"_"+name_matches_list[idex].lower()+".txt","w")
           text_file.write(text2)
           text_file.close()
@@ -180,8 +181,8 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  #retrieveStatements()
-  #retrieveMinutes()
+  retrieveStatements()
+  retrieveMinutes()
   retrieveSpeeches()
   
 if __name__ == '__main__':
