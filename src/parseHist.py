@@ -5,18 +5,18 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
-quick code to paree the WikiPedia Fed Rate History Table
-and create a csv file
-
-python ./parseHist.py ../text/history/hist_wikipedia.txt 
-"""
 
 
 class ParseWiki :
+    """
+    quick code to paree the WikiPedia Fed Rate History Table
+    and create a csv file
+
+    python ./parseHist.py ../text/history/hist_wikipedia.txt 
+    """
 
     def parse(fname):
-        # ../text/history/hist_wikipedia.txt 
+        # ../text/history/hist_wikipedia.txt > FedHistory.csv
         def fmtDate(m, d, y):
             months=["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"]
@@ -50,8 +50,24 @@ class ParseWiki :
                 print(ss)
 
 class PlotFFHist:
+    """
+    Plot the 2 different sources of FF on same graph
+    """
 
-    def readData(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
+    def parseHist2(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
+        def DT(ds):
+            return datetime.datetime(int(ds[0:4]),int(ds[4:6]),int(ds[6:]),0, 0, 0)
+        dates,rates = [],[]
+        with open(fname) as fd:
+            for i,line in enumerate(fd):
+                line=line.strip()
+                dt=DT(line.split(",")[0])
+                if dt < cutoff : continue
+                dates.append(dt)
+                rates.append(float(line.split(",")[1]))
+        return dates,rates
+
+    def parseHist1(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
         # ../text/history/fed-funds-rate-historical-chart.csv
         def DT(year, month, day, hour=0, minute=0, second=0):
             return datetime.datetime(year, month, day, hour, minute, second, 0)
@@ -75,21 +91,28 @@ class PlotFFHist:
                 rates.append(float(line.split(",")[1]))
         return dates,rates
 
-    def plotData(fname):
-        dates,rates = PlotFFHist.readData(fname)
+    def plotData(hist1, hist2):
+        dates1,rates1 = PlotFFHist.parseHist1(hist1)
+        dates2,rates2 = PlotFFHist.parseHist2(hist2)
         Fmt = DateFormatter("%Y-%m")
         fig, ax = plt.subplots()
         ax.set(title="Federal Funds Rate History")
-        ax.plot(dates, rates)
+        ax.plot(dates1, rates1, 'b', label='MacroTrends')
+        ax.plot(dates2, rates2, 'r', label='WikiPedia')
         ax.xaxis.set_major_formatter(Fmt)
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles, labels)
         plt.show()
 
 def main():
-    fname = sys.argv[1]
-    assert os.path.exists(fname)
-    #ParseWiki.parse(fname)
-    # python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv
-    PlotFFHist.plotData(fname)
+    """
+    To Run
+     python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv 
+    """
+
+    hist1, hist2 = sys.argv[1], sys.argv[2]
+    assert os.path.exists(hist1) and os.path.exists(hist2)
+    PlotFFHist.plotData(hist1, hist2)
     
 
 if __name__ == '__main__':
