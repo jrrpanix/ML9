@@ -91,14 +91,31 @@ class PlotFFHist:
                 rates.append(float(line.split(",")[1]))
         return dates,rates
 
-    def plotData(hist1, hist2):
-        dates1,rates1 = PlotFFHist.parseHist1(hist1)
-        dates2,rates2 = PlotFFHist.parseHist2(hist2)
+    def getMinuteDates(dirname):
+        def DT(ds):
+            return datetime.datetime(int(ds[0:4]),int(ds[4:6]),int(ds[6:]),0, 0, 0)
+
+        mdates, adates = [], []
+        for f in sorted(os.listdir(dirname)):
+            se = os.path.splitext(f)[0]
+            d0, d1 = se.split("_")[0], se.split("_")[-1]
+            mdates.append(DT(d0))
+            adates.append(DT(d1))
+        return mdates, adates
+
+    def plotData(hist1, hist2, dirname):
+        dates1, rates1 = PlotFFHist.parseHist1(hist1)
+        dates2, rates2 = PlotFFHist.parseHist2(hist2)
+        mdates, adates =  PlotFFHist.getMinuteDates(dirname)
         Fmt = DateFormatter("%Y-%m")
         fig, ax = plt.subplots()
         ax.set(title="Federal Funds Rate History")
         ax.plot(dates1, rates1, 'b', label='MacroTrends')
         ax.plot(dates2, rates2, 'r', label='WikiPedia')
+        MaxRate=np.max(rates1)
+        for i in range(len(mdates)):
+            ax.plot([mdates[i],mdates[i]], [0, MaxRate], 'g')
+
         ax.xaxis.set_major_formatter(Fmt)
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles, labels)
@@ -109,10 +126,14 @@ def main():
     To Run
      python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv 
     """
+    if len(sys.argv) < 4:
+        print("Requires 3 Parameters, example usage")
+        print("python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv ../text/minutes")
+        quit()
 
-    hist1, hist2 = sys.argv[1], sys.argv[2]
+    hist1, hist2, dirname = sys.argv[1], sys.argv[2], sys.argv[3]
     assert os.path.exists(hist1) and os.path.exists(hist2)
-    PlotFFHist.plotData(hist1, hist2)
+    PlotFFHist.plotData(hist1, hist2, dirname)
     
 
 if __name__ == '__main__':
