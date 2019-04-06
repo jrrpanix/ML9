@@ -58,10 +58,54 @@ def retrieveMinutes():
     html = response.read()
     soup = BeautifulSoup(html,'html5lib')
     text2 = soup.get_text(strip = True)
-    text2= text2[text2.find("Developments in Financial Markets"):]
+    text2= text2[text2.find("in Financial Markets"):]
     text2=text2[:text2.index("Last Update")+100]
     start = 'Last Update:'
     end = 'Board of Gov'
+    publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
+    print(publish_date)
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
+    text2 = text2[:text2.index("Secretary")]
+    prog = re.compile('\d{4}\d{2}\d{2}')
+    dateOfText=re.findall(prog,listOfMinutesURLs[index])
+    publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+    text_file = open(os.getcwd()+"/minutes/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
+    text_file.write(text2)
+    text_file.close()
+
+
+def retrieveOldWebsiteMinutes():
+  listOfMinutesURLs = [
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100127.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100316.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100428.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100623.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100810.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100921.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20101103.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20101214.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110126.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110315.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110427.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110622.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110809.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110921.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20111102.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20111213.htm"
+  ]
+  
+  ##Minute Text Retrieval
+  for index,x in enumerate(listOfMinutesURLs):
+    print (listOfMinutesURLs[index])
+    response = urllib.request.urlopen(listOfMinutesURLs[index])
+    html = response.read()
+    soup = BeautifulSoup(html,'html5lib')
+    text2 = soup.get_text(strip = True)
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
+    text2= text2[text2.index("Developments in Financial Markets"):]
+    text2=text2[:text2.index("Last update")+100]
+    start = 'Last update:'
+    end = 'Home'
     publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
     print(publish_date)
     text2 = text2[:text2.index("Secretary")]
@@ -72,9 +116,41 @@ def retrieveMinutes():
     text_file.write(text2)
     text_file.close()
 
-
+    
 def retrieveStatements():
   listOfStmtURLs = [
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100127a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100316a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100428a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100623a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100810a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20100921a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20101103a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20101214a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110126a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110315a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110427a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110622a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110809a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20110921a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20111102a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20111213a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120125a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120313a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120425a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120620a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120801a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20120913a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20121024a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20121212a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130130a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130320a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130501a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130619a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130731a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20130918a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20131030a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20131218a.htm",
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20141217a.htm",
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20141029a.htm",
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20140917a.htm",
@@ -124,6 +200,7 @@ def retrieveStatements():
     text2 = soup.get_text(strip = True)
     text2= text2[text2.find("Information received since"):]
     text2=text2[:text2.index("Last Update:")]
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfStmtURLs[index])
     text_file = open(os.getcwd()+"/statements/"+dateOfText[0]+".txt","w")
@@ -133,9 +210,8 @@ def retrieveStatements():
 def retrieveSpeeches():
   #get a list of URLS of Governors speeches for a given year
   #Scrape the dates and names from the website for a given year
-
-  listOfYears = ['2014','2015','2016','2017','2018']
-  search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard','clarida','stein']
+  listOfYears = ['2011','2012','2013','2014','2015','2016','2017','2018']
+  search_list = ['yellen', 'powell', 'fischer','tarullo','quarles','brainard','clarida','stein','bernanke','duke','raskin']
   for year in listOfYears:
     #Build list of dates
     urls = list()
@@ -162,6 +238,7 @@ def retrieveSpeeches():
           text2= text2[text2.find("Please enable JavaScript if it is disabled in your browser or access the information through the links provided below"):]
           text2= text2[text2.find("Share"):]
           text2=text2[:text2.index("Last Update:")]
+          text2 = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
           if text2.find("1.") != -1:
             text2=text2[:text2.find("1.")]
           text_file = open(os.getcwd()+"/speeches/"+date_matches_list[idex]+"_"+name_matches_list[idex].lower()+".txt","w")
@@ -183,6 +260,7 @@ def main():
   os.chdir(os.path.abspath(os.curdir)+"/text")
   retrieveStatements()
   retrieveMinutes()
+  retrieveOldWebsiteMinutes()
   retrieveSpeeches()
   
 if __name__ == '__main__':
