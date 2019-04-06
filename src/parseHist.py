@@ -51,7 +51,7 @@ class ParseWiki :
 
 class PlotFFHist:
 
-    def readData(fname):
+    def readData(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
         # ../text/history/fed-funds-rate-historical-chart.csv
         def DT(year, month, day, hour=0, minute=0, second=0):
             return datetime.datetime(year, month, day, hour, minute, second, 0)
@@ -69,7 +69,9 @@ class PlotFFHist:
                 if not start and len(line.split(",")) == 2 : 
                     start=True
                     continue
-                dates.append(parseDate(line.split(",")[0]))
+                dt = parseDate(line.split(",")[0])
+                if dt < cutoff : continue
+                dates.append(dt)
                 rates.append(float(line.split(",")[1]))
         return dates,rates
 
