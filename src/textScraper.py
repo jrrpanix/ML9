@@ -10,6 +10,22 @@ import datetime
 
 def retrieveMinutes():
   listOfMinutesURLs = [
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120125.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120313.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120425.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120620.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120801.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120913.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20121024.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20121212.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130130.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130320.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130501.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130619.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130731.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130918.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20131030.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20131218.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141217.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141029.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140917.htm",
@@ -189,7 +205,8 @@ def retrieveStatements():
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180801a.htm",
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180613a.htm",
     "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180502a.htm",
-    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180321a.htm"
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180321a.htm",
+    "https://www.federalreserve.gov/newsevents/pressreleases/monetary20180131a.htm"
   ]
   
   ##Statement Text Retrieval
