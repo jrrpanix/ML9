@@ -1,0 +1,7 @@
+For using nltk in pyton it needs a bunch of stuff downloaded
+To download it start a python session
+
+python
+>>> import nltk
+>>> nltk.download() # this will cause a window to pop up and select all to downlaod everything
+>>> quit()
