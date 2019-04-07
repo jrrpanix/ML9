@@ -136,8 +136,27 @@ class PlotFFHist:
 
 class CreateFedAction:
 
-    def create(minutesDIR, macroCSV):
-        HistDataReader.getMintuesDates(minutesDIR)
+    def create(minutesDIR, macroCSV,tol=0.03):
+        # input minutesDIR ../text/minutes
+        # input macrotrends ../text/history/fed-funds-rate-historical-chart.csv 
+        # output RatesDecision.csv
+        mdates, adates = HistDataReader.getMinutesDates(minutesDIR)
+        dates, rates = HistDataReader.readMacroTrends(macroCSV)
+        for i in range(len(mdates)):
+            md, ad = mdates[i], adates[i]
+            mix = dates.index(md)
+            aix = dates.index(ad)
+            r0, r1 = rates[mix], rates[aix]
+            dr = r1 - r0
+            if dr > tol :
+                c,d = "raise",1
+            elif dr < -tol:
+                c,d = "lower",-1
+            else:
+                c,d = "unchg",0
+            print("%s,%s,%.2f,%.2f,%s,%d,%.2f" % 
+                  (md.strftime("%Y%m%d"), ad.strftime("%Y%m%d"), rates[mix], rates[aix],c,d,dr))
+        
 
 def main():
     """
@@ -158,7 +177,8 @@ def main():
     else:
         hist1, hist2, dirname = defaults[0], defaults[1], defaults[2]
     assert os.path.exists(hist1) and os.path.exists(hist2) and os.path.exists(dirname)
-    PlotFFHist.plotData(hist1, hist2, dirname)
+    #PlotFFHist.plotData(hist1, hist2, dirname)
+    CreateFedAction.create(dirname, hist1)
     
 
 if __name__ == '__main__':
