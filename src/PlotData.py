@@ -6,6 +6,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+class RateDecision:
+
+    def __init__(self, d0, d1, r0, r1, dec, d, dr):
+        self.date0 = d0
+        self.date1 = d1
+        self.rate0 = r0
+        self.rate1 = r1
+        self.decision = dec
+        self.direction = d
+        self.dRate = dr
+
+    def __str__(self):
+        return "%s,%s,%.2f,%.2f,%s,%d,%.2f" % \
+            (self.date0.strftime("%Y%m%d"),self.date1.strftime("%Y%m%d"),self.rate0,
+             self.rate1,self.decision,self.direction,self.dRate)
+    
+
 
 class ParseWiki :
     """
@@ -110,6 +127,19 @@ class HistDataReader:
         return mdates, adates
         
 
+    def readDecision(fname):
+        def DT(ds):
+            return datetime.datetime(int(ds[0:4]),int(ds[4:6]),int(ds[6:]),0, 0, 0)
+        data = []
+        with open(fname) as fd:
+            for line in fd:
+                line = line.strip()
+                if len(line) < 2 : continue
+                s = line.split(",")
+                data.append(RateDecision(DT(s[0]),DT(s[1]),float(s[2]),float(s[3]),s[4],int(s[5]),float(s[6])))
+        return data
+
+
 class PlotFFHist:
     """
     Plot MacroTrends FF, WikiPedia FF and FF minutes dates
@@ -137,6 +167,9 @@ class PlotFFHist:
 class CreateFedAction:
 
     def create(minutesDIR, macroCSV,tol=0.03):
+        # using the minutes dates and the macrotrends FF data set
+        # create a dataset which is the FED action
+
         # input minutesDIR ../text/minutes
         # input macrotrends ../text/history/fed-funds-rate-historical-chart.csv 
         # output RatesDecision.csv
@@ -157,6 +190,24 @@ class CreateFedAction:
             print("%s,%s,%.2f,%.2f,%s,%d,%.2f" % 
                   (md.strftime("%Y%m%d"), ad.strftime("%Y%m%d"), rates[mix], rates[aix],c,d,dr))
         
+    def plot(decisionFile):
+        def points(data, direction):
+            dates = np.array([d.date1 for i,d in enumerate(data) if d.direction == direction])
+            ddir = np.array([d.direction for d in data if d.direction == direction])
+            return dates, ddir
+        data = HistDataReader.readDecision(decisionFile)
+
+        update, updir = points(data, 1)
+        unchdate, unchdir = points(data, 0)
+        dndate, dndir = points(data, -1)
+        Fmt = DateFormatter("%Y")
+        fig, ax = plt.subplots()
+        ax.set(title="Fed Rate Decisions")
+        ax.scatter(update, updir, c='g', marker="^")
+        ax.scatter(unchdate, unchdir, c='b', marker="x")
+        ax.scatter(dndate, dndir, c='r', marker="v")
+        ax.xaxis.set_major_formatter(Fmt)
+        plt.show()
 
 def main():
     """
@@ -166,8 +217,13 @@ def main():
      ../text/history/fed-funds-rate-historical-chart.csv 
      ../text/history/WikipediaFFParsed.csv 
      ../text/minutes
+     ../text/history/RatesDecision.csv
     """
-    defaults=["../text/history/fed-funds-rate-historical-chart.csv", "../text/history/WikipediaFFParsed.csv", "../text/minutes"]
+    defaults=["../text/history/fed-funds-rate-historical-chart.csv", 
+              "../text/history/WikipediaFFParsed.csv", 
+              "../text/minutes",
+              "../text/history/RatesDecision.csv"
+              ]
     if len(sys.argv) == 2 and sys.argv[1] =="--help":
         print("Requires 3 Parameters, example usage")
         print("python ./PlotData.py %s %s %s" % (defaults[0], defaults[1], defaults[2]))
@@ -178,7 +234,7 @@ def main():
         hist1, hist2, dirname = defaults[0], defaults[1], defaults[2]
     assert os.path.exists(hist1) and os.path.exists(hist2) and os.path.exists(dirname)
     #PlotFFHist.plotData(hist1, hist2, dirname)
-    CreateFedAction.create(dirname, hist1)
+    CreateFedAction.plot(defaults[3])
     
 
 if __name__ == '__main__':
