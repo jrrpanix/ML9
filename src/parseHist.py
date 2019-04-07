@@ -127,13 +127,16 @@ def main():
     To Run
      python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv 
     """
-    if len(sys.argv) < 4:
+    defaults=["../text/history/fed-funds-rate-historical-chart.csv", "../text/history/FedHistory.csv", "../text/minutes"]
+    if len(sys.argv) == 2 and sys.argv[1] =="--help":
         print("Requires 3 Parameters, example usage")
         print("python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv ../text/minutes")
         quit()
-
-    hist1, hist2, dirname = sys.argv[1], sys.argv[2], sys.argv[3]
-    assert os.path.exists(hist1) and os.path.exists(hist2)
+    elif len(sys.argv) == 4:
+        hist1, hist2, dirname = sys.argv[1], sys.argv[2], sys.argv[3]
+    else:
+        hist1, hist2, dirname = defaults[0], defaults[1], defaults[2]
+    assert os.path.exists(hist1) and os.path.exists(hist2) and os.path.exists(dirname)
     PlotFFHist.plotData(hist1, hist2, dirname)
     
 
