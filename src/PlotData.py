@@ -11,12 +11,12 @@ class ParseWiki :
     """
     quick code to paree the WikiPedia Fed Rate History Table
     and create a csv file
-
-    python ./parseHist.py ../text/history/hist_wikipedia.txt 
+    input  ../text/history/WikipediaFF.txt
+    output ../test/history/WikipediaFFParsed.csv
     """
 
-    def parse(fname):
-        # ../text/history/hist_wikipedia.txt > FedHistory.csv
+    def parse(fname="../text/history/WikipediaFF.txt"):
+        #output ../test/history/WikipediaFFParsed.csv
         def fmtDate(m, d, y):
             months=["January", "February", "March", "April", "May", "June", "July",
                     "August", "September", "October", "November", "December"]
@@ -125,12 +125,16 @@ class PlotFFHist:
 def main():
     """
     To Run
-     python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv 
+     python ./PlotData.py 
+     defaults : 
+     ../text/history/fed-funds-rate-historical-chart.csv 
+     ../text/history/WikipediaFFParsed.csv 
+     ../text/minutes
     """
-    defaults=["../text/history/fed-funds-rate-historical-chart.csv", "../text/history/FedHistory.csv", "../text/minutes"]
+    defaults=["../text/history/fed-funds-rate-historical-chart.csv", "../text/history/WikipediaFFParsed.csv", "../text/minutes"]
     if len(sys.argv) == 2 and sys.argv[1] =="--help":
         print("Requires 3 Parameters, example usage")
-        print("python ./parseHist.py ../text/history/fed-funds-rate-historical-chart.csv ../text/history/FedHistory.csv ../text/minutes")
+        print("python ./PlotData.py %s %s %s" % (defaults[0], defaults[1], defaults[2]))
         quit()
     elif len(sys.argv) == 4:
         hist1, hist2, dirname = sys.argv[1], sys.argv[2], sys.argv[3]
