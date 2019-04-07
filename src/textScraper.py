@@ -272,16 +272,14 @@ def retrieveSpeeches():
           print('Reason: ', e.reason)
 
 
-
-
 def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  #retrieveStatements()
-  #retrieveMinutes()
+  retrieveStatements()
+  retrieveMinutes()
   retrieveOldWebsiteMinutes()
-  #retrieveSpeeches()
+  retrieveSpeeches()
   
 if __name__ == '__main__':
   main()
