@@ -49,12 +49,13 @@ class ParseWiki :
                 ss = "%s,%.2f,%.2f,%s" % (fmtDate(m,d,y), float(fflb),float(ffub), dr)
                 print(ss)
 
-class PlotFFHist:
-    """
-    Plot the 2 different sources of FF on same graph
-    """
 
-    def parseHist2(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
+class HistDataReader:
+
+    def readWikiCSV(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
+        # read the parsed Wikipedia data "WikipediaFFParsed.csv"
+        # input ../test/history/WikipediaFFParsed.csv
+        # output returns date, rates vector
         def DT(ds):
             return datetime.datetime(int(ds[0:4]),int(ds[4:6]),int(ds[6:]),0, 0, 0)
         dates,rates = [],[]
@@ -67,8 +68,10 @@ class PlotFFHist:
                 rates.append(float(line.split(",")[1]))
         return dates,rates
 
-    def parseHist1(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
-        # ../text/history/fed-funds-rate-historical-chart.csv
+    def readMacroTrends(fname, cutoff=datetime.datetime(year=2001, month=1, day=1, hour=0,minute=0,second=0)):
+        # read the downloaded macrotrends csv file
+        # input ../text/history/fed-funds-rate-historical-chart.csv
+        # output returns date, rates vector
         def DT(year, month, day, hour=0, minute=0, second=0):
             return datetime.datetime(year, month, day, hour, minute, second, 0)
 
@@ -90,8 +93,11 @@ class PlotFFHist:
                 dates.append(dt)
                 rates.append(float(line.split(",")[1]))
         return dates,rates
-
-    def getMinuteDates(dirname):
+    
+    def getMinutesDates(dirname):
+        # extract dates from file names of fedminutes data
+        # input ../text/minutes - directory name holding minutes files
+        # output returns mdates, adates - the two dates on teh minutes file names
         def DT(ds):
             return datetime.datetime(int(ds[0:4]),int(ds[4:6]),int(ds[6:]),0, 0, 0)
 
@@ -102,11 +108,17 @@ class PlotFFHist:
             mdates.append(DT(d0))
             adates.append(DT(d1))
         return mdates, adates
+        
 
-    def plotData(hist1, hist2, dirname):
-        dates1, rates1 = PlotFFHist.parseHist1(hist1)
-        dates2, rates2 = PlotFFHist.parseHist2(hist2)
-        mdates, adates =  PlotFFHist.getMinuteDates(dirname)
+class PlotFFHist:
+    """
+    Plot MacroTrends FF, WikiPedia FF and FF minutes dates
+    """
+
+    def plotData(macroCSV, wikiCSV, minutesDIR):
+        dates1, rates1 = HistDataReader.readMacroTrends(macroCSV)
+        dates2, rates2 = HistDataReader.readWikiCSV(wikiCSV)
+        mdates, adates =  HistDataReader.getMinutesDates(minutesDIR)
         #Fmt = DateFormatter("%Y-%m")
         Fmt = DateFormatter("%Y")
         fig, ax = plt.subplots()
@@ -121,6 +133,11 @@ class PlotFFHist:
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles, labels)
         plt.show()
+
+class CreateFedAction:
+
+    def create(minutesDIR, macroCSV):
+        HistDataReader.getMintuesDates(minutesDIR)
 
 def main():
     """
