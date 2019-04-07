@@ -276,10 +276,10 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  #retrieveStatements()
+  retrieveStatements()
   retrieveMinutes()
   retrieveOldWebsiteMinutes()
-  #retrieveSpeeches()
+  retrieveSpeeches()
   
 if __name__ == '__main__':
   main()
