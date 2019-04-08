@@ -344,7 +344,7 @@ def retrieveMinutesWOStatement():
     publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
     print(publish_date)
     text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
-    text2 = text2[:text2.rfind("the conclusion of the discussion")]
+    text2 = text2[:text2.rfind("At the conclusion of the discussion")]
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfMinutesURLs[index])
     publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
@@ -387,10 +387,10 @@ def retrieveOldWebsiteMinutesWOStatement():
     end = 'Home'
     publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
     print(publish_date)
-    if text2.rfind("the conclusion of the discussion") == -1:
+    if text2.rfind("At the conclusion of the discussion") == -1:
       text2 = text2[:text2.index("Return to top")]
     else: 
-      text2 = text2[:text2.rfind("the conclusion of the discussion")]
+      text2 = text2[:text2.rfind("At the conclusion of the discussion")]
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfMinutesURLs[index])
     publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
