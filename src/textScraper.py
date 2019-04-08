@@ -271,6 +271,132 @@ def retrieveSpeeches():
         except URLError as e:
           print('Reason: ', e.reason)
 
+def retrieveMinutesWOStatement():
+  listOfMinutesURLs = [
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120125.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120313.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120425.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120620.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120801.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20120913.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20121024.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20121212.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130130.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130320.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130501.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130619.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130731.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20130918.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20131030.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20131218.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141217.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20141029.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140917.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140730.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140618.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140430.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140319.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20140129.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20151216.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20151028.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150917.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150729.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150617.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150429.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150318.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20150128.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20161214.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20161102.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160921.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160727.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160615.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160427.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160316.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160127.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20171213.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20171101.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170920.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170726.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170614.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170503.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170315.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20170201.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20181219.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20181108.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180926.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180801.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180613.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180502.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180321.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20180131.htm"
+  ]
+  
+  ##Minute Text Retrieval
+  for index,x in enumerate(listOfMinutesURLs):
+    response = urllib.request.urlopen(listOfMinutesURLs[index])
+    html = response.read()
+    soup = BeautifulSoup(html,'html5lib')
+    text2 = soup.get_text(strip = True)
+    text2= text2[text2.find("in Financial Markets"):]
+    text2=text2[:text2.index("Last Update")+100]
+    start = 'Last Update:'
+    end = 'Board of Gov'
+    publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
+    print(publish_date)
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
+    text2 = text2[:text2.rfind("the conclusion of the discussion")]
+    prog = re.compile('\d{4}\d{2}\d{2}')
+    dateOfText=re.findall(prog,listOfMinutesURLs[index])
+    publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+    text_file = open(os.getcwd()+"/minutes_wo_statement/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
+    text_file.write(text2)
+    text_file.close()
+
+
+def retrieveOldWebsiteMinutesWOStatement():
+  listOfMinutesURLs = [
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100127.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100316.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100428.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100623.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100810.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100921.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20101103.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20101214.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110126.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110315.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110427.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110622.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110809.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20110921.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20111102.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20111213.htm"
+  ]
+  
+  ##Minute Text Retrieval
+  for index,x in enumerate(listOfMinutesURLs):
+    print (listOfMinutesURLs[index])
+    response = urllib.request.urlopen(listOfMinutesURLs[index])
+    html = response.read()
+    soup = BeautifulSoup(html,'html5lib')
+    text2 = soup.get_text(strip = True)
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
+    text2= text2[text2.index("Developments in Financial Markets"):]
+    text2=text2[:text2.index("Last update")+100]
+    start = 'Last update:'
+    end = 'Home'
+    publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
+    print(publish_date)
+    if text2.rfind("the conclusion of the discussion") == -1:
+      text2 = text2[:text2.index("Return to top")]
+    else: 
+      text2 = text2[:text2.rfind("the conclusion of the discussion")]
+    prog = re.compile('\d{4}\d{2}\d{2}')
+    dateOfText=re.findall(prog,listOfMinutesURLs[index])
+    publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+    text_file = open(os.getcwd()+"/minutes_wo_statement/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
+    text_file.write(text2)
+    text_file.close()
 
 def main():
   #Change relative directory
@@ -280,6 +406,8 @@ def main():
   retrieveMinutes()
   retrieveOldWebsiteMinutes()
   retrieveSpeeches()
+  retrieveMinutesWOStatement()
+  retrieveOldWebsiteMinutesWOStatement()
   
 if __name__ == '__main__':
   main()
