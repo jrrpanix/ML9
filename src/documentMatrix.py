@@ -106,36 +106,3 @@ if __name__ == '__main__':
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-#np.append(a,[['apples','test','adfasfdasdf']],axis=0)
-
-
-#corpusdir = '/home/jjl359/ML/ML9/text/minutes/'
-#newcorpus = PlaintextCorpusReader(corpusdir, '.*')
-#corpus  = nltk.Text(newcorpus.words())
-#len(newcorpus.words()),[len(newcorpus.words(d)) for d in newcorpus.fileids()]
-
-#corpus = []
-#path = '/home/jjl359/ML/ML9/text/minutes/'
-#for files in glob.glob(path+"*.txt"):
-#  f = open(files)
-#  corpus.append(f.read())  
-
-#frequencies = Counter([])
-
-#for text in corpus:
-#    token = nltk.word_tokenize(text)
-#    bigrams = ngrams(token, 2)
-#    frequencies += Counter(bigrams)
-
-#for files in glob.glob(path+"*.txt"):
-#  f = open(files)
-#  a = np.append(a,[['label','date',f.read().translate(translator)]],axis=0)
