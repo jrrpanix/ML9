@@ -5,3 +5,6 @@ python
 >>> import nltk
 >>> nltk.download() # this will cause a window to pop up and select all to downlaod everything
 >>> quit()
+
+
+````documentMatrix.py```` contains regex code to normalize text, i.e. remove punctuation, remove non-utf8 characters, convert what looks likes a percentage (3 percent) to the word 'percenttarget', among others
