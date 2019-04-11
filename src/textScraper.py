@@ -165,7 +165,7 @@ def retrieveMinutes():
     #Save file with date published and the date of the meeting
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfMinutesURLs[index])
-    publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+    publishDate = datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
     text_file = open(os.getcwd()+"/minutes/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
     text_file.write(text2)
     text_file.close()
@@ -173,7 +173,6 @@ def retrieveMinutes():
 
 def retrieveOldWebsiteMinutes():
   listOfMinutesURLs = [
-  "https://www.federalreserve.gov/monetarypolicy/fomc20080625.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090128.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090318.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090429.htm",
@@ -213,8 +212,13 @@ def retrieveOldWebsiteMinutes():
     text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
 
     #Capture the beginning and end of the minutes
-    text2= text2[text2.index("Developments in Financial Markets"):]
-    text2=text2[:text2.index("Last update")+100]
+    if(text2.find("Developments in Financial Markets") != -1):
+      text2= text2[text2.index("Developments in Financial Markets"):]
+      text2=text2[:text2.index("Last update")+100]
+    else: 
+      text2= text2[text2.index("Market Developments and Open Market Operations"):]
+      text2=text2[:text2.index("Last update")+100]
+      
     start = 'Last update:'
     end = 'Home'
     publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
@@ -227,7 +231,7 @@ def retrieveOldWebsiteMinutes():
     #Save minutes with the release and meeting dates in the file name
     prog = re.compile('\d{4}\d{2}\d{2}')
     dateOfText=re.findall(prog,listOfMinutesURLs[index])
-    publishDate = datetime.datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+    publishDate = datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
     text_file = open(os.getcwd()+"/minutes/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
     text_file.write(text2)
     text_file.close()
@@ -352,7 +356,7 @@ def retrieveSpeeches():
     for idex, match in enumerate(date_matches_list):
       for jdex, speaker in enumerate(search_list):
         try:
-          date_matches_list[idex] = datetime.datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
+          date_matches_list[idex] = datetime.strptime(match, "%m/%d/%Y").strftime("%Y%m%d")
           urlCall = 'https://www.federalreserve.gov/newsevents/speech/'+search_list[jdex].lower()+date_matches_list[idex]+'a.htm'
           print(urlCall)
           response = urllib.request.urlopen(urlCall)
@@ -382,10 +386,10 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  #retrieveStatements()
-  #retrieveMinutes()
-  #retrieveOldWebsiteMinutes()
-  #retrieveSpeeches()
+  retrieveStatements()
+  retrieveMinutes()
+  retrieveOldWebsiteMinutes()
+  retrieveSpeeches()
   
   ##Get Pre 2008 Minutes
   fomcDate = []
