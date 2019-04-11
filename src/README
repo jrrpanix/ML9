@@ -7,4 +7,4 @@ python
 >>> quit()
 
 
-````documentMatrix.py```` contains regex code to normalize text, i.e. remove punctuation, remove non-utf8 characters, convert what looks likes a percentage (3 percent) to the word 'percenttarget', among others
+documentMatrix.py contains regex code to normalize text, i.e. remove punctuation, remove non-utf8 characters, convert what looks likes a percentage (3 percent) to the word 'percenttarget', among others
