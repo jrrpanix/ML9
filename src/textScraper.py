@@ -7,6 +7,75 @@ import re
 import pandas as pd
 import os
 import datetime
+import csv
+from datetime import datetime
+from dateutil.parser import parse
+
+def pre08_MinutesScraper(meetingList):
+
+  for i in meetingList:
+    url = 'https://www.federalreserve.gov/fomc/minutes/'+i[0]+'.htm'
+    secondUrl = 'https://www.federalreserve.gov/monetarypolicy/fomcminutes'+i[0]+'.htm'
+    thirdUrl = 'https://www.federalreserve.gov/monetarypolicy/fomc20080625.htm'
+    prog = re.compile('\d{4}\d{2}\d{2}')
+    try:
+      response = urllib.request.urlopen(url)
+      dateOfText=re.findall(prog,url)
+    except: 
+      try:
+        response = urllib.request.urlopen(secondUrl)
+        dateOfText=re.findall(prog,secondUrl)
+      except:
+        response = urllib.request.urlopen(thirdUrl)
+        dateOfText=re.findall(prog,thirdUrl)
+      
+    html = response.read()
+    soup = BeautifulSoup(html,'html5lib')
+    text2 = soup.get_text(strip = True)
+    text2=re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
+    text2 = re.sub(r'\s+', ' ',text2).strip()
+    startIndex = 0
+    endIndex = 0
+    if (text2.find("Developments in Financial Markets") != -1):
+      startIndex = text2.index("Developments in Financial Markets")
+    elif (text2.find("The information reviewed") != -1):
+      startIndex = text2.index("The information reviewed")
+    elif (text2.find("The information provided") != -1):
+      startIndex = text2.index("The information provided")
+    elif (text2.find("The Manager of the System Open Market") != -1):
+      startIndex = text2.find("The Manager of the System Open Market")  
+    else: 
+      print(i[0])
+      print("I SHOULDNT BE HERE")
+    text2=text2[:text2.rfind("Last update")+100]
+    start = ''
+    end = ''
+    publishDate = ''
+    lengthText = len(text2)
+    if(text2[lengthText-2:].lower() == 'pm'):
+      start = 'Last update:'
+      publish_date = (text2[text2.find(start)+len(start):]).replace(',','')
+      publish_date = (publish_date).replace(' ','')
+      publish_date_object = datetime.strptime(publish_date,'%B%d%Y%H:%M%p')
+      publish_date = publish_date_object.strftime('%Y%m%d')
+      publishDate = publish_date
+    else: 
+      start = 'Last update:'
+      end = 'Home'
+      publish_date = (text2[text2.find(start)+len(start):text2.rfind(end)]).strip()
+      publishDate = datetime.strptime(publish_date,"%B %d, %Y").strftime("%Y%m%d")
+
+    if text2.find("Notation") == -1:
+      text2 = text2[:text2.rfind("Return to top")]
+    else: 
+      text2 = text2[:text2.rfind("Notation")]
+    
+    print(publish_date)
+    text2 = re.sub("[^\x20-\x7E]", "",text2)
+    text_file = open(os.getcwd()+"/minutes/"+dateOfText[0]+"_minutes_published_"+publishDate+".txt","w")
+    print(dateOfText[0]+"_minutes_published_"+publishDate)
+    text_file.write(text2)
+    text_file.close()    
 
 def retrieveMinutes():
 
@@ -104,6 +173,15 @@ def retrieveMinutes():
 
 def retrieveOldWebsiteMinutes():
   listOfMinutesURLs = [
+  "https://www.federalreserve.gov/monetarypolicy/fomc20080625.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090128.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090318.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090429.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090624.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090812.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20090923.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20091104.htm",
+  "https://www.federalreserve.gov/monetarypolicy/fomcminutes20091216.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100127.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100316.htm",
   "https://www.federalreserve.gov/monetarypolicy/fomcminutes20100428.htm",
@@ -262,7 +340,7 @@ def retrieveSpeeches():
     speechYearUrl = "https://www.federalreserve.gov/newsevents/speech/"+year+"-speeches.htm"
     response =  urllib.request.urlopen(speechYearUrl)
     html = response.read()
-    soup = BeautifulSoup(html,'html5lib')
+    soup = BeautifulSoup(html,'html5lib')#.decode('utf-8','ignore')
     text2 = soup.get_text(strip = True)
     date_reg_exp = re.compile('\d{2}/\d{2}/\d{4}')
     date_matches_list=date_reg_exp.findall(text2)
@@ -279,7 +357,7 @@ def retrieveSpeeches():
           print(urlCall)
           response = urllib.request.urlopen(urlCall)
           html = response.read()
-          soup = BeautifulSoup(html,'html5lib')
+          soup = BeautifulSoup(html,'html5lib')#.decode('utf-8','ignore')
           text2 = soup.get_text(strip = True)
  
           #Index to the start of the speech and end of the speech to exclude java script text
@@ -304,11 +382,20 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  retrieveStatements()
-  retrieveMinutes()
-  retrieveOldWebsiteMinutes()
-  retrieveSpeeches()
+  #retrieveStatements()
+  #retrieveMinutes()
+  #retrieveOldWebsiteMinutes()
+  #retrieveSpeeches()
   
+  ##Get Pre 2008 Minutes
+  fomcDate = []
+  path = '../text/history/pre09MeetingList.csv'
+  with open(path, 'r') as f:
+    reader = csv.reader(f)
+    fomcDate = list(reader)
+  os.chdir("..")
+  os.chdir(os.path.abspath(os.curdir)+"/text")
+  pre08_MinutesScraper(fomcDate)  
 if __name__ == '__main__':
   main()
 

@@ -18,14 +18,19 @@ def createDocumentMatrixWMetadata():
   FOMC_HISTORY = np.loadtxt('../text/history/RatesDecision.csv', dtype='str', delimiter=',')
   textArray =  np.empty((1,4),dtype='<U5')
   ##Path names to text files
-  paths = ['../text/minutes/',
-           '../text/statements/',
-           '../text/speeches/']
+  paths = [#'../text/minutes/']#,
+           '../text/statements/']#,
+           #'../text/speeches/']
   for i in paths:
     for files in glob.glob(i+"*.txt"):
     ##Regex patterns to clean the text 
       f = open(files)
       clean = re.sub("\\'",'',f.read()).strip()
+      clean = re.sub("[^\x20-\x7E]", "",clean).strip()
+      clean = re.sub("[0-9/-]+ to [0-9/-]+ percent","percenttarget ",clean)
+      clean = re.sub("[0-9/-]+ percent","percenttarget ",clean)
+      clean = re.sub("[0-9]+.[0-9]+ percent","dpercent",clean)
+      clean = re.sub(r"[0-9]+","dd",clean)
       clean = re.sub("U.S.","US",clean).strip()
       clean = re.sub("p.m.","pm",clean).strip()
       clean = re.sub("a.m.","am",clean).strip()
@@ -38,7 +43,7 @@ def createDocumentMatrixWMetadata():
                    " ",          # and replace it with a single space
                    clean, flags=re.VERBOSE)
       clean = re.sub('--', ' ', clean).strip()  
-      clean = re.sub("'",'',clean).strip()
+      clean = re.sub("'",' ',clean).strip()
       clean = re.sub("- ","-",clean).strip()
       clean = re.sub('\(A\)', ' ', clean).strip()
       clean = re.sub('\(B\)', ' ', clean).strip()
