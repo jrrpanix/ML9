@@ -8,3 +8,5 @@ python
 
 
 documentMatrix.py contains regex code to normalize text, i.e. remove punctuation, remove non-utf8 characters, convert what looks likes a percentage (3 percent) to the word 'percenttarget', among others
+
+fedActionFromTargetRate.py calculates the rate decisions based off of data from the FRED (St Louis) database - it generates a 7 column csv file (Date, Minutes, rate before, rate after, action, flag, amount of change
