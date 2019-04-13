@@ -18,9 +18,9 @@ def createDocumentMatrixWMetadata():
   FOMC_HISTORY = np.loadtxt('../text/history/RatesDecision.csv', dtype='str', delimiter=',')
   textArray =  np.empty((1,4),dtype='<U5')
   ##Path names to text files
-  paths = [#'../text/minutes/']#,
-           '../text/statements/']#,
-           #'../text/speeches/']
+  paths = ['../text/minutes/'],
+           '../text/statements/'],
+           '../text/speeches/']
   for i in paths:
     for files in glob.glob(i+"*.txt"):
     ##Regex patterns to clean the text 
