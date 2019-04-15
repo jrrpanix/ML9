@@ -7,6 +7,26 @@ python
 >>> quit()
 
 
-documentMatrix.py contains regex code to normalize text, i.e. remove punctuation, remove non-utf8 characters, convert what looks likes a percentage (3 percent) to the word 'percenttarget', among others
+Decision.py
+ - reads in RatesDecision.csv
+ - creates a pandas data frame
+ - with following columns 
+    names = ["minutes_date","publish_date","before","after","decision","flag","change"]
+ - date types are  datetime.datetime
 
-fedActionFromTargetRate.py calculates the rate decisions based off of data from the FRED (St Louis) database - it generates a 7 column csv file (Date, Minutes, rate before, rate after, action, flag, amount of change
+CreateDocumentMatrix.py
+ - updated version of documentMatrix.py
+ - inputs RatesDecision.csv , paths = ['../text/minutes/','../text/statements/','../text/speeches/']
+ - has error checking 
+ - default usage ./CreateDocumentMatrix.py -o <your_output_file>
+
+documentMatrix.py 
+ - contains regex code to normalize text, 
+    i.e. remove punctuation, remove non-utf8 characters, 
+    convert what looks likes a percentage (3 percent) to the word 'percenttarget', 
+    among others
+
+fedActionFromTargetRate.py 
+ - calculates the rate decisions based off of data from the FRED (St Louis) database - 
+    it generates a 7 column csv file 
+    (Date, Minutes, rate before, rate after, action, flag, amount of change)

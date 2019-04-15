@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import datetime 
 import numpy as np
 from matplotlib.dates import DateFormatter
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import CountVectorizer
 
-
-def getDecisionDF(decisionFile):
+def GetDecisionDF(decisionFile):
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
     usecols = [0,1,2,3,4,5,6]
     dtypes={"minutes_date":'str',"publish_date":'str',"before":'float',"after":'float',"decision":'str',"flag":'float',"change":'float'}
@@ -38,14 +39,29 @@ def PlotDecisionResponse(df):
     plt.show()
 
 
+def testSKLearn(docDir):
+    def getDocuments(docDir):
+        docs=os.listdir(docDir)
+        return docs[0]
+
+    def readText(fname):
+        with open(fname) as reader:
+            return reader.read()
+    fn=getDocuments(args.minutesDir)
+    text = readText(os.path.join(args.minutesDir, fn))
+    v = CountVectorizer()
+    X = v.fit_transform([text])
+    print(v.get_feature_names())
+    print(X.toarray())
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Spring 2019 Final Project')
     parser.add_argument('-i','--decisionFile', help='directory holding minutes dates', default="../text/history/RatesDecision.csv")
-    parser.add_argument('-r','--fedFundsHistFile', help='file holding historcal fed runds rate',
-                        default="../text/history/FedFundsRates.csv")
-    parser.add_argument('-o','--output', help='output file', default=None)
+    parser.add_argument('-m','--minutesDir', default="../text/minutes")
     parser.add_argument('-p','--plot', action='store_true', default=False) 
     args = parser.parse_args()
     
-    df=getDecisionDF(args.decisionFile)
-    PlotDecisionResponse(df)
+    df=GetDecisionDF(args.decisionFile)
+    if args.plot:
+        PlotDecisionResponse(df)

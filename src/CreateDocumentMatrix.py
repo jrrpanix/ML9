@@ -1,19 +1,11 @@
+import argparse
 import os
-import csv
 import glob
 import numpy as np
-import nltk
-import string
 import re
 import datetime
 import bisect
-
-from numpy import genfromtxt
-from nltk import *
-from nltk.corpus.reader.plaintext import PlaintextCorpusReader
-from nltk import word_tokenize
-from nltk.util import ngrams
-from Decision import getDecisionDF
+from Decision import GetDecisionDF
 
 def cleanFile(files):
     f = open(files)
@@ -58,18 +50,15 @@ def getMeetingDate(files):
     files, ext = os.path.splitext(files)
     fV = files.split('/')
     if len(fV) < 4 :
-        #print("Bad File %s" % files)
         return None
     dstr = fV[3].split('_')[0]
     if len(dstr) != 8 :
-        #print("Bad Date in File %s" % files)
         return None
     return datetime.datetime.strptime(dstr,"%Y%m%d")
 
 def getDecision(HIST, meeting_date):
     ix=HIST.index[HIST['minutes_date'] == meeting_date].tolist()
     if len(ix) == 0:
-        #print("ix date out of range %s" % meeting_date)
         return None
     ix = ix[0]
     return HIST.iloc[ix]["decision"]
@@ -84,6 +73,9 @@ def getDocType(i):
     return i.split("/")[2]
 
 def getPreviousDate(HIST, doc_date):
+    #
+    # Not sure here might need to use 'publish_date'
+    #
     datesV = HIST["minutes_date"].values
     ib = bisect.bisect_left(datesV, np.datetime64(doc_date))
     if ib > 1 and ib < len(HIST):
@@ -108,16 +100,19 @@ def CreateMatrix(HIST, paths, outputFile):
                 good.append((meeting_date,files))
                 textArray = np.append(textArray,[[action,meeting_date,doc_type,clean.strip().lower()]],axis=0)
     textArray = np.delete(textArray,0,0)
-    numpy.save(outputFile,textArray)   
+    np.save(outputFile,textArray)   
     print("finished processing num_ok=%d fails=%d, output=%s" % (len(good),len(errors), outputFile))
 
 
 if __name__=='__main__':
+    parser = argparse.ArgumentParser(description='ML Spring 2019 Final Project')
+    parser.add_argument('-i','--decisionFile', help='directory holding minutes dates', default="../text/history/RatesDecision.csv")
+    parser.add_argument('-o','--outputFile', required=True)
+    args = parser.parse_args()
     
-    HIST = getDecisionDF('../text/history/RatesDecision.csv')
-    paths = ['../text/minutes/',
-             '../text/statements/',
-             '../text/speeches/']
-    outputFile = "docmatrix.npy"
-    CreateMatrix(HIST, paths, outputFile)
+    HIST = GetDecisionDF(args.decisionFile)
+    # columns in decision df
+    # "minutes_date","publish_date","before","after","decision","flag","change"]
+    paths = ['../text/minutes/','../text/statements/','../text/speeches/']
+    CreateMatrix(HIST, paths, args.outputFile)
 
