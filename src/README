@@ -13,6 +13,11 @@ Decision.py
  - with following columns 
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
  - date types are  datetime.datetime
+ - Primary Usage:creating RatesDecision pandas dataframe
+   from Decision import GetDecisionDF
+   HIST = GetDecisionDF(RatesDecisionFile)
+ - Secondary usage: can also run as a main to plot of the Fed Decision Responses
+   python ./Decision.py -p # will plot the decisions on graph
 
 CreateDocumentMatrix.py
  - updated version of documentMatrix.py
