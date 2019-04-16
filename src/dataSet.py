@@ -7,6 +7,7 @@ import datetime
 import bisect
 import re
 from clean import simple_clean
+from clean import complex_clean
 from sklearn.feature_extraction.text import CountVectorizer
 
 #
@@ -144,7 +145,6 @@ class DataSet:
             
             # skip a couple 
             if ix < 2 : continue
-            print(publishDate)
              
             # prior minutes
             minutes_ix = ix - 1
