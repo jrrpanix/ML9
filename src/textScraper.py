@@ -366,7 +366,7 @@ def retrieveSpeeches():
  
           #Index to the start of the speech and end of the speech to exclude java script text
           text2= text2[text2.find("Please enable JavaScript if it is disabled in your browser or access the information through the links provided below"):]
-          text2= text2[text2.find("Share"):]
+          text2= text2[text2.find("Share")+5:]
           text2=text2[:text2.index("Last Update:")]
           text2 = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text2)
           if text2.find("1.") != -1:
@@ -386,10 +386,10 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  #retrieveStatements()
-  #retrieveMinutes()
-  #retrieveOldWebsiteMinutes()
-  #retrieveSpeeches()
+  retrieveStatements()
+  retrieveMinutes()
+  retrieveOldWebsiteMinutes()
+  retrieveSpeeches()
   
   ##Get Pre 2008 Minutes
   fomcDate = []
