@@ -14,6 +14,11 @@ from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
+# more scalable version of model0
+# this version allows for multiple fit methods (SVM, Logistic, Logistic Lasso)
+# this method also computes the mean and std deviation of the accuracy by
+# running each model Niter Times
+
 
 def decisionDF(decisionFile):
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
