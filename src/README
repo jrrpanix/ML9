@@ -35,3 +35,15 @@ fedActionFromTargetRate.py
  - calculates the rate decisions based off of data from the FRED (St Louis) database - 
     it generates a 7 column csv file 
     (Date, Minutes, rate before, rate after, action, flag, amount of change)
+
+textScraper.py
+   - Scrapes the www.federalreserve.gov website for speeches, minutes, and statements
+   - Multiple functions to separately scrape minutes, speeches, and statements from different time periods
+   - Primarily uses regex to determine what portion of the webpage to scrape, this is useful for javascript rendered pages and the minutes pages where there is a fair amount of extraneous text
+
+fedActionFromTargetRate.py
+   - This file implies the target rate from daily target FED funds data scraped from FRED (St Louis Fed economic data)
+   - The file leverages the date of the statements and minutes .txt files to determine if any given day is a Fed day
+   - After 2017, the determination for FED rate action from the target rate changes is slightly different than pre 2017 dates
+   
+   
