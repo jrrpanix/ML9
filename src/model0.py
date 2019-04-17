@@ -14,6 +14,16 @@ from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
+#
+# simple model
+# readin in minutes and decision history
+# align minutes dates to decision hisotry
+# create a data set of text minutes and decision(action,no action)
+# create training / test data
+# create fetures from words using simple vectorizer
+# fit model to training data using SVM
+# compute accuracy
+
 
 def decisionDF(decisionFile):
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
@@ -81,3 +91,4 @@ if __name__ == '__main__':
 
 
 
+ 
