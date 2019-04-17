@@ -4,6 +4,7 @@ import argparse
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 
@@ -81,9 +82,12 @@ def splitData(all_data, pctTrain):
     test_data = pd.DataFrame(all_data[Ntrain:], columns=['text', 'sentiment'])
     return train_data, test_data
 
-def runExperiment(common, pos, neg, N, textLen, pctSen, pctTrain):
+def experimentData(common, pos, neg, N, textLen, pctSen, pctTrain):
     all_data = generateData(common, pos, neg, N, textLen, pctSen)
     train_data, test_data = splitData(all_data, pctTrain)
+    return train_data, test_data
+
+def fitData(train_data, test_data, modelType="svc"):
     
     # create features
     vectorizer = CountVectorizer(stop_words="english",preprocessor=None)
@@ -91,7 +95,12 @@ def runExperiment(common, pos, neg, N, textLen, pctSen, pctTrain):
     test_features = vectorizer.transform(test_data["text"])
 
     # run model
-    model = LinearSVC()
+    if modelType == "logistic":
+        model = LogisticRegression()
+    elif modelType == "logistic_lasso":
+        model = LogisticRegression(penalty='l1')
+    else:
+        model = LinearSVC()
     model.fit(training_features, train_data["sentiment"])
     y_pred = model.predict(test_features)
     acc = accuracy_score(test_data["sentiment"], y_pred)
@@ -117,20 +126,29 @@ if __name__ == '__main__':
     print("%10s, %10s, %10s, %10s, %10s, %10s, %10s" %('T','N',' TextLen', 'PctSen', 'PctTrain', 'mean(acc)', 'std(acc)'))
     stp=40
     S = int(textLen/stp)
-    L, A = np.zeros(S), np.zeros(S)
+    L, Asvm, Alog, Aloglasso = np.zeros(S), np.zeros(S), np.zeros(S), np.zeros(S)
     # vary textLen
     for j, l in enumerate(range(stp,textLen+1,stp)):
-        acc = np.zeros(T)
-        for i in range(len(acc)):
-            acc[i] = runExperiment(common, pos, neg, N, l, pctSen, pctTrain)
-        A[j] = np.mean(acc)
+        accsvm, acclog, accloglasso = np.zeros(T), np.zeros(T), np.zeros(T)
+        for i in range(T):
+            train_data, test_data = experimentData(common, pos, neg, N, l, pctSen, pctTrain)
+            accsvm[i] = fitData(train_data, test_data, modelType='svc')
+            acclog[i] = fitData(train_data, test_data, modelType='logistic')
+            accloglasso[i] = fitData(train_data, test_data, modelType='logistic_lasso')
+        Asvm[j] = np.mean(accsvm)
+        Alog[j] = np.mean(acclog)
+        Aloglasso[j] = np.mean(accloglasso)
         L[j] = l
-        print("%10d, %10d, %10d, %10.3f, %10.3f, %10.3f, %10.3f" % (T,N, l, pctSen, pctTrain, np.mean(acc), np.std(acc)))
+        print("%10d, %10d, %10d, %10.3f, %10.3f, %10.3f, %10.3f, %10.3f, %10.3f, %10.3f, %10.3f" % 
+              (T,N, l, pctSen, pctTrain, np.mean(accsvm), np.std(accsvm), np.mean(acclog), np.std(acclog), np.mean(accloglasso), np.std(accloglasso)))
             
 
-    plt.plot(L, A)
+    plt.plot(L, Asvm, label='svm')
+    plt.plot(L, Alog, label='logistic')
+    plt.plot(L, Aloglasso, label='logistic_lasso')
     plt.title("Accuracy vs N Words in Text")
     plt.xlabel("Words in Text")
     plt.ylabel("Accuracy")
+    plt.legend()
     plt.show()
 
