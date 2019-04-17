@@ -2,21 +2,22 @@ import os
 import csv
 import glob
 import numpy as np
-import nltk
 import string
 import re
+import pandas as pd
 
 from numpy import genfromtxt
-from nltk import *
-from nltk.corpus.reader.plaintext import PlaintextCorpusReader
-from nltk import word_tokenize
-from nltk.util import ngrams
 from collections import Counter
 
 def createDocumentMatrixWMetadata():
   ##Read FOMC History array
-  FOMC_HISTORY = np.loadtxt('../text/history/RatesDecision.csv', dtype='str', delimiter=',')
-  textArray =  np.empty((1,4),dtype='<U5')
+  FOMC_HISTORY = pd.read_csv('../text/history/RatesDecision.csv', delimiter=',')
+  #textArray =  np.empty((1,4),dtype='<U5')
+  #textArray = pd.DataFrame()
+  textArray = pd.DataFrame(columns=['dateMeeting','dateDoc','monthDecision','fedAction','text'])
+
+
+  textArray.loc[1,['dateMeeting','dateDoc','monthDecision','fedAction','text']]=[date1,date2,month1,flag1,doc1]
   ##Path names to text files
   paths = ['../text/minutes/',
            '../text/statements/',

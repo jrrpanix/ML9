@@ -37,13 +37,13 @@ def pre08_MinutesScraper(meetingList):
     startIndex = 0
     endIndex = 0
     if (text2.find("Developments in Financial Markets") != -1):
-      startIndex = text2.index("Developments in Financial Markets")
+      text2= text2[text2.find("Developments in Financial Markets"):]
     elif (text2.find("The information reviewed") != -1):
-      startIndex = text2.index("The information reviewed")
+      text2= text2[text2.find("The information reviewed"):]
     elif (text2.find("The information provided") != -1):
-      startIndex = text2.index("The information provided")
+      text2= text2[text2.find("The information provided"):]
     elif (text2.find("The Manager of the System Open Market") != -1):
-      startIndex = text2.find("The Manager of the System Open Market")  
+      text2= text2[text2.find("The Manager of the System Open Market"):]
     else: 
       print(i[0])
       print("I SHOULDNT BE HERE")
@@ -386,10 +386,10 @@ def main():
   #Change relative directory
   os.chdir("..")
   os.chdir(os.path.abspath(os.curdir)+"/text")
-  retrieveStatements()
-  retrieveMinutes()
-  retrieveOldWebsiteMinutes()
-  retrieveSpeeches()
+  #retrieveStatements()
+  #retrieveMinutes()
+  #retrieveOldWebsiteMinutes()
+  #retrieveSpeeches()
   
   ##Get Pre 2008 Minutes
   fomcDate = []
