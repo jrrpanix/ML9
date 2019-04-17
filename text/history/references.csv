@@ -1,0 +1,4 @@
+Good reference for Logistic regression, https://towardsdatascience.com/multi-class-text-classification-with-scikit-learn-12f1e60e0a9f
+Good overview of Naive Bayes, https://medium.com/@martinpella/naive-bayes-for-sentiment-analysis-49b37db18bf8
+NLTK Guide - downside is having to implement in NLTK, https://www.nltk.org/book/ch06.html
+This might be an interesting reference for SK tool generally, https://python.gotrained.com/text-classification-with-pandas-scikit/
