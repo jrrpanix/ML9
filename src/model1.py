@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 # allows the text preprocessing algorithm to be selected
 # running each model Niter Times
 
+# python ./model1.py --Niter 100 --cleanAlgo complex
+# python ./model1.py --Niter 100 --cleanAlgo simple
 
 def decisionDF(decisionFile):
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
