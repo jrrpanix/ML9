@@ -33,6 +33,8 @@ def complex_clean(text):
         clean = re.sub('\(iii\)', ' ', clean).strip()
         clean = re.sub('\(iv\)', ' ', clean).strip()
         clean = re.sub('/^\\:/',' ',clean).strip()
+        clean = re.sub(r"FRB: .*Minutes of", "Minutes of", clean)
+
         clean=re.sub('\s+', ' ',clean).strip()
     except:
         print("Unable to clean file %s" % files)
@@ -64,6 +66,7 @@ def simple_clean(text):
     
     # convert text to lowercase
     text = text.strip().lower()
+
     
     # replace punctuation characters with spaces
     filters='!"\'#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
