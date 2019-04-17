@@ -103,7 +103,7 @@ class docOrganizer:
     
 def main(): 
   do = docOrganizer()
-  do.createDocMatrix()
+  docMatrix = do.createDocMatrix()
   
   
 if __name__ == '__main__':
