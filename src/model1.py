@@ -38,7 +38,7 @@ def decisionDF(decisionFile):
 
 def getMinutes(minutesDir, decisionDF, clean_algo):
     minutes, publish , data = [], [], []
-    for files in os.listdir(minutesDir):
+    for files in sorted(os.listdir(minutesDir)):
         f, ext = os.path.splitext(files)
         minutes.append(datetime.datetime.strptime(f.split("_")[0],"%Y%m%d"))
         publish.append(datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d"))
@@ -106,10 +106,11 @@ if __name__ == '__main__':
     results= runModels(models, data, args.Niter, args.pctTrain)
     print("Determining Fed Action from minutes")
     pctTrain, cleanA, Niter, N = args.pctTrain, args.cleanAlgo, args.Niter, len(data)
-    print("%-20s %5s %10s %10s %5s %8s %6s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean"))
+    start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
+    print("%-20s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
     for m, r in zip(models, results):
         name, mu, s = m[0], np.mean(r), np.std(r) 
-        print("%-20s %5s %10.4f %10.4f %5d %8.3f %6s" % (name, Niter, mu, s, N, pctTrain, cleanA))
+        print("%-20s %5s %10.4f %10.4f %5d %8.3f %6s %10s %10s" % (name, Niter, mu, s, N, pctTrain, cleanA, start, end))
 
 
 
