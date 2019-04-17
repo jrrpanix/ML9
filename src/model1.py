@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 # more scalable version of model0
 # this version allows for multiple fit methods (SVM, Logistic, Logistic Lasso)
 # this method also computes the mean and std deviation of the accuracy by
+# allows the text preprocessing algorithm to be selected
 # running each model Niter Times
 
 
@@ -35,7 +36,7 @@ def decisionDF(decisionFile):
     df['publish_date'] = pd.to_datetime(df['publish_date'],format="%Y%m%d")
     return df
 
-def getMinutes(minutesDir, decisionDF, clean_algo=complex_clean):
+def getMinutes(minutesDir, decisionDF, clean_algo):
     minutes, publish , data = [], [], []
     for files in os.listdir(minutesDir):
         f, ext = os.path.splitext(files)
@@ -49,7 +50,7 @@ def getMinutes(minutesDir, decisionDF, clean_algo=complex_clean):
             print("exception reading file %s" % files)
             print(e)
             quit()
-    return data
+    return data, publish
 
 def splitTrainTest(data, trainPct):
     np.random.shuffle(data)
@@ -77,10 +78,7 @@ def runModels(models, data, Nitr, pctTrain):
             if iter == 0:
                 results.append(np.zeros(Nitr))
             results[i][iter]=acc
-    print("%-20s %4s %10s %10s" % ("Model Name", "Nitr", "mean(acc)", "std(acc)"))
-    for m, r in zip(models, results):
-        name, mu,r = m[0], np.mean(r), np.std(r)
-        print("%-20s %4d %10.4f %10.4f" % (name, Nitr, mu, r))
+    return results
                 
 
 if __name__ == '__main__':
@@ -91,10 +89,13 @@ if __name__ == '__main__':
     parser.add_argument('--statements', default="../text/statements")
     parser.add_argument('--pctTrain', default=0.75, type=float)
     parser.add_argument('--Niter', default=10, type=int)
+    parser.add_argument('--cleanAlgo', default="complex")
     args = parser.parse_args()
 
+    Niter = args.Niter
+    clean_algo = complex_clean if args.cleanAlgo == "complex" else simple_clean
     df = decisionDF(args.decision)
-    data = getMinutes(args.minutes, df)
+    data, publish = getMinutes(args.minutes, df, clean_algo)
 
     # Train on current minutes
     models=[("svm",LinearSVC()),
@@ -102,7 +103,13 @@ if __name__ == '__main__':
             ("logistic_lasso",LogisticRegression(penalty='l1'))]
 
 
-    runModels(models, data, args.Niter, args.pctTrain)
+    results= runModels(models, data, args.Niter, args.pctTrain)
+    print("Determining Fed Action from minutes")
+    pctTrain, cleanA, Niter, N = args.pctTrain, args.cleanAlgo, args.Niter, len(data)
+    print("%-20s %5s %10s %10s %5s %8s %6s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean"))
+    for m, r in zip(models, results):
+        name, mu, s = m[0], np.mean(r), np.std(r) 
+        print("%-20s %5s %10.4f %10.4f %5d %8.3f %6s" % (name, Niter, mu, s, N, pctTrain, cleanA))
 
 
 
