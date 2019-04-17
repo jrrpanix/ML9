@@ -46,4 +46,6 @@ fedActionFromTargetRate.py
    - The file leverages the date of the statements and minutes .txt files to determine if any given day is a Fed day
    - After 2017, the determination for FED rate action from the target rate changes is slightly different than pre 2017 dates
    
-   
+documentMatrix.py
+   - Organizes documents by row - after pre-processing the text using regular expressions
+   - Originally written with numpy, will switch to pandas
