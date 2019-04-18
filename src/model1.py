@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
 import matplotlib.pyplot as plt
 
 # more scalable version of model0
@@ -102,7 +103,8 @@ if __name__ == '__main__':
     # Train on current minutes
     models=[("svm",LinearSVC()),
             ("logistic",LogisticRegression()),
-            ("logistic_lasso",LogisticRegression(penalty='l1'))]
+            ("logistic_lasso",LogisticRegression(penalty='l1')),
+            ("Naive Bayes",MultinomialNB())]
 
 
     results= runModels(models, data, args.Niter, args.pctTrain)
