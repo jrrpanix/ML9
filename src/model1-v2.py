@@ -79,21 +79,25 @@ def splitTrainTest(data, data_statements, trainPct):
     test_data = pd.DataFrame(data[Ntrain:], columns=['text', 'sentiment'])
     return train_data, test_data
 
-def getFeatures(train_data, test_data):
-    vectorizer = CountVectorizer(stop_words="english",preprocessor=None)
+def getFeatures(train_data, test_data,ngrams):
+    vectorizer = CountVectorizer(stop_words="english",ngram_range=(ngrams,ngrams),preprocessor=None)
     training_features = vectorizer.fit_transform(train_data["text"])                                 
     test_features = vectorizer.transform(test_data["text"])
     return training_features, test_features
 
-def runModels(models, data, data_statements, Nitr, pctTrain):
+def runModels(models, data, data_statements, Nitr, pctTrain, ngrams):
     results=[]
     for iter in range(Nitr):
         train_data, test_data = splitTrainTest(data, data_statements, pctTrain)
-        training_features, test_features = getFeatures(train_data, test_data)
+        training_features, test_features = getFeatures(train_data, test_data, ngrams)
         for i, m in enumerate(models):
             model=m[1]
             model.fit(training_features, train_data["sentiment"])
             y_pred = model.predict(test_features)
+            #print("Y_pred:" + str(y_pred))
+            #if("log" in m[0]):
+            #  ynew = model.predict_proba(test_features)
+            #  print("Prob: " + str(ynew))
             acc = accuracy_score(test_data["sentiment"], y_pred)
             if iter == 0:
                 results.append(np.zeros(Nitr))
@@ -119,23 +123,21 @@ if __name__ == '__main__':
     data_statements = getStatements(args.statements, df, clean_algo)
     # Train on current minutes
     models=[("svm",LinearSVC()),
-            ("logistic",LogisticRegression()),
-            ("logistic_lasso",LogisticRegression(penalty='l1')),
+            ("logistic",LogisticRegression(solver='liblinear')),
+            ("logistic_lasso",LogisticRegression(penalty='l1',solver='liblinear')),
             ("Naive Bayes",MultinomialNB())]
 
 
-    results= runModels(models, data, data_statements, args.Niter, args.pctTrain)
-    print("Determining Fed Action from minutes")
-    pctTrain, cleanA, Niter, N = args.pctTrain, args.cleanAlgo, args.Niter, len(data)
-    print(N)
-    print(len(data_statements))
-    N = N + int(len(data_statements))
-    print(N)
-    pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
-    print(pctTrain)
-    start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
-    print("%-20s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
-    for m, r in zip(models, results):
+
+    for i in (1,2,3,4):
+      results= runModels(models, data, data_statements, args.Niter, args.pctTrain, i)
+      print("Determining Fed Action from minutes and statements \nNgrams: " +str(i))
+      pctTrain, cleanA, Niter, N = args.pctTrain, args.cleanAlgo, args.Niter, len(data)
+      N = N + int(len(data_statements))
+      pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
+      start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
+      print("%-20s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
+      for m, r in zip(models, results):
         name, mu, s = m[0], np.mean(r), np.std(r) 
         print("%-20s %5s %10.4f %10.4f %5d %8.3f %6s %10s %10s" % (name, Niter, mu, s, N, pctTrain, cleanA, start, end))
 
