@@ -88,7 +88,7 @@ class docOrganizer:
           previous = ''
           for index,row in self.FOMC_HISTORY.iterrows():
             if(row['MeetingDate'] > pd.to_datetime(meeting_date,format='%Y%m%d')):  
-              meeting_date = previous
+              meeting_date = row['MeetingDate']
               break    
             previous = row['MeetingDate']          
           x=self.FOMC_HISTORY[self.FOMC_HISTORY['MeetingDate'] == pd.to_datetime(meeting_date,format='%Y%m%d')].iloc[0]['Direction']

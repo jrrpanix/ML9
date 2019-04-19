@@ -81,7 +81,8 @@ def splitTrainTest(data, data_statements, trainPct):
 
 def getFeatures(train_data, test_data,ngrams):
     vectorizer = CountVectorizer(stop_words="english",ngram_range=(ngrams,ngrams),preprocessor=None)
-    training_features = vectorizer.fit_transform(train_data["text"])                                 
+    training_features = vectorizer.fit_transform(train_data["text"])             
+
     test_features = vectorizer.transform(test_data["text"])
     return training_features, test_features
 
@@ -111,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('--minutes', default="../text/minutes")
     parser.add_argument('--speeches', default="../text/speeches")
     parser.add_argument('--statements', default="../text/statements")
-    parser.add_argument('--pctTrain', default=0.75, type=float)
+    parser.add_argument('--pctTrain', default=0.6, type=float)
     parser.add_argument('--Niter', default=10, type=int)
     parser.add_argument('--cleanAlgo', default="complex")
     args = parser.parse_args()
@@ -126,15 +127,12 @@ if __name__ == '__main__':
             ("logistic",LogisticRegression(solver='liblinear')),
             ("logistic_lasso",LogisticRegression(penalty='l1',solver='liblinear')),
             ("Naive Bayes",MultinomialNB())]
-
-
-
     for i in (1,2,3,4):
       results= runModels(models, data, data_statements, args.Niter, args.pctTrain, i)
       print("Determining Fed Action from minutes and statements \nNgrams: " +str(i))
       pctTrain, cleanA, Niter, N = args.pctTrain, args.cleanAlgo, args.Niter, len(data)
       N = N + int(len(data_statements))
-      pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
+      pctTrain = (int(len(data)*args.pctTrain) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
       start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
       print("%-20s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
       for m, r in zip(models, results):
