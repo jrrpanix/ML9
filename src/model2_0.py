@@ -17,14 +17,13 @@ from sklearn.naive_bayes import MultinomialNB
 import matplotlib.pyplot as plt
 import csv
 
-# more scalable version of model0
 # this version allows for multiple fit methods (SVM, Logistic, Logistic Lasso)
 # this method also computes the mean and std deviation of the accuracy by
+# this version also allows for ngrams
 # allows the text preprocessing algorithm to be selected
 # running each model Niter Times
 
-# python ./model1.py --Niter 100 --cleanAlgo complex
-# python ./model1.py --Niter 100 --cleanAlgo simple
+# python ./model2_0.py --ngram 1,1 2,2 3,3 1,3 2,3 --Niter 50 --pctTrain .8
 
 def decisionDF(decisionFile):
     names = ["minutes_date","publish_date","before","after","decision","flag","change"]
@@ -127,7 +126,6 @@ if __name__ == '__main__':
     models=[("svm",LinearSVC()),
             ("logistic",LogisticRegression(solver='liblinear')),
             ("logistic_lasso",LogisticRegression(penalty='l1',solver='liblinear')),
-            ("logistic_l2",LogisticRegression(penalty='l2',solver='liblinear')),
             ("Naive Bayes",MultinomialNB())]
 
     print("Determining Fed Action from minutes")
@@ -135,7 +133,7 @@ if __name__ == '__main__':
     N = N + int(len(data_statements))
     for ngram in ngrams:
         results= runModels(models, data, data_statements, Niter, pctTrain, ngram)
-        pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
+        #pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
         start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
         ngramstr = str(ngram[0]) + ":" + str(ngram[1])
         for m, r in zip(models, results):
