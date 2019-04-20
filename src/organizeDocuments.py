@@ -13,7 +13,7 @@ from collections import Counter
 
 class docOrganizer:
   def __init__(self):
-    self.columnNames = ['meetingDate','documentDate','documentType','meetingMonth','actionFlag','doctext']
+    self.columnNames = ['meetingDate','documentDate','documentType','meetingMonth','actionFlag','identifier','doctext']
     self.textArray = pd.DataFrame(columns=self.columnNames)
     self.paths = ['../text/minutes/',
            '../text/statements/',
@@ -57,6 +57,7 @@ class docOrganizer:
         clean = re.sub('/^\\:/',' ',clean).strip()
         clean=re.sub('\s+', ' ',clean).strip()  
         doc_type = i.split("/")
+        identifier = ''
         ##Get meeting date
         if(doc_type[2] == 'minutes'):
           meeting_date = files.split('/')
@@ -64,9 +65,8 @@ class docOrganizer:
           meeting_date = meeting_date[3].split('_')[0]
           ##Get Fed action label
           document_date = document_date[3].split('_')[3].split('.')[0]
-          print(meeting_date)
-          print("doc date " + document_date)
           x=self.FOMC_HISTORY[self.FOMC_HISTORY['MeetingDate'] == pd.to_datetime(meeting_date,format='%Y%m%d')].iloc[0]['Direction']
+          identifier = 'FOMC'
           if (x == 'unchg'):
             action = 0
           else:
@@ -77,12 +77,15 @@ class docOrganizer:
           document_date = meeting_date
           #Get Fed action label
           x=self.FOMC_HISTORY[self.FOMC_HISTORY['MeetingDate'] == pd.to_datetime(meeting_date,format='%Y%m%d')].iloc[0]['Direction']
+          identifier = 'FOMC'
           if (x == 'unchg'):
             action = 0
           else:
             action = 1
         elif(doc_type[2] == 'speeches'):
           meeting_date = files.split('/')
+          identifier = files.split('/')
+          identifier = identifier[3].split('_')[1].split('.')[0]
           meeting_date = meeting_date[3].split('_')[0].split('.')[0]
           document_date = meeting_date
           previous = ''
@@ -97,14 +100,12 @@ class docOrganizer:
           else:
             action = 1
         counter = counter + 1
-        self.textArray.loc[counter] = [meeting_date,document_date,doc_type[2],1,action,clean]
-    print(self.textArray)
+        self.textArray.loc[counter] = [meeting_date,document_date,doc_type[2],1,action,identifier,clean]
     return(self.textArray)
     
 def main(): 
   do = docOrganizer()
   docMatrix = do.createDocMatrix()
-  
-  
+    
 if __name__ == '__main__':
   main()
