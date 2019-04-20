@@ -74,13 +74,13 @@ def getStatements(statementsDir, decisionDF, clean_algo):
         quit()
     return data
 
-def getSpeeches(yearVector):
+def getSpeeches(year):
     oranizeDocs=organizeDocuments.docOrganizer()
     fullDocumentMatrix = oranizeDocs.createDocMatrix()
     speechesMatrix = fullDocumentMatrix[fullDocumentMatrix['documentType']=='speeches']
     speechesMatrix['meetingDate'] = pd.to_datetime(speechesMatrix['meetingDate'])
     speechesMatrix['year'] = speechesMatrix['meetingDate'].dt.year
-    speechesMatrix = speechesMatrix[speechesMatrix['year']== 2018]
+    speechesMatrix = speechesMatrix[speechesMatrix['year']== year]
     data = []
     for index,row in speechesMatrix.iterrows():    
       data.append([row['doctext'],row['actionFlag']])
