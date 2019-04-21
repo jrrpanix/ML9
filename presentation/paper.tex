@@ -10,6 +10,8 @@
 % AMS packages:
 \usepackage{amsmath, amsthm, amsfonts}
 
+% Document Formatting Packages:
+\usepackage{hyperref}
 
 %-----------------------------------------------------------------
 \title{Predicting FOMC Actions using ML and NLP}
@@ -27,13 +29,7 @@
 \abstract{abstract text }
 
 \section{Introduction}
-In this paper we methods in Natural Language Processing and Machine Learning to predict Federal Open Market 
-Committee Rate actions (hold or change) using text from Federal Reserve Meeting Minutes, speeches and statements 
-from Federal Reserve Officials.  Since this is work in sentimite analysis we created a simulator to 
-gain insight into the sensitiviy of detecting sentimite by randomly generating words with from a mix
-of distributions containing positive words, negative words and commonly used words.  That simulator
-showed accuracy could hit levels of 1.0 given enough training data and high percentage of sentimite words
-to overall text.
+In this paper we methods in Natural Language Processing and Machine Learning to predict Federal Open Market Committee (FOMC) rate actions (hold or change) using text from FOMC meeting minutes, Board of Governors speeches, and FOMC post-meeting statements.  Since this is work in sentiment analysis we created a simulator to gain insight into the sensitiviy of detecting sentiment by randomly generating words with from a mix of distributions containing hawkish or dovish(positive) words, negative words, and commonly used words.  That simulator showed accuracy could hit levels of 100 percent given enough training data and high percentage of sentiment (i.e., positive)  words to overall text.
 
 
 
@@ -44,6 +40,16 @@ To add
 \subsubsection{Subsubsection}\label{sec:nothing2}
 
 To add
+
+\section{Methodology}
+
+\subsection{Data}
+
+The time frame of our study covered 2000 to 2019.  The primary source of our textual data were FOMC statements, FOMC meeting minutes, and Board of Governors speeches from \url{www.federalreserve.gov}.  For FOMC statements between 2000 and 2008 we utilized Stanford's FOMC corpus.  The Stanford FOMC corpus only has text prior to 2008 and it does not have Board of Governor speeches.  \vspace{5mm}
+
+The data for the Federal Funds target rate and target range (post 2009) is from FRED St. Louis.  FRED offers a wealth of economic data and information to promote economic education and enhance economic research. FRED is updated regularly and allows 24/7 access to regional and national financial and economic data.  \vspace{5mm}
+
+
 
 % Bibliography
 %-----------------------------------------------------------------
