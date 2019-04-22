@@ -33,5 +33,5 @@ class modelutils:
         # slow without a format hint as data size grows
         df['minutes_date'] = pd.to_datetime(df['minutes_date'],format="%Y%m%d")
         df['publish_date'] = pd.to_datetime(df['publish_date'],format="%Y%m%d")
-    return df
+        return df
 
