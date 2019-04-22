@@ -49,3 +49,7 @@ fedActionFromTargetRate.py
 organizeDocuments.py
    - Organizes documents by row - after pre-processing the text using regular expressions
    - Originally written with numpy, will switch to pandas
+
+
+conda install pytorch torchvision -c soumith
+For NerualNetModel
