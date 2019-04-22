@@ -13,7 +13,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as data 
 from torch.autograd import Variable
+from clean import simple_clean
+from clean import complex_clean
+from modelutils import modelutils
 
+# to install pytorch
+# conda install pytorch torchvision -c soumith
 
 #
 # Neural Net1 Fully Connected
@@ -37,7 +42,6 @@ class FCNet1(nn.Module):
         self.fc3 = nn.Sequential(nn.Linear(n2, 2), nn.Sigmoid())
 
     def forward(self, X):
-        
         xo = self.fc1(X)
         xo = self.fc2(xo)
         return self.fc2(xo)
@@ -55,6 +59,13 @@ if __name__ == '__main__':
     parser.add_argument('--ngram', nargs='+', default=['1,1'])
     args = parser.parse_args()
 
-    net = FCNet1(100)
     
+    clean_algo = complex_clean if args.cleanAlgo == "complex" else simple_clean
+    df = modelutils.decisionDF(args.decision)
+    data, publish = modelutils.getMinutes(args.minutes, df, clean_algo)
+    #data_statements = modelutils.getStatements(args.statements, df, clean_algo)
+
+    net = FCNet1(100)
+
+
 
