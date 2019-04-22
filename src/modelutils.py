@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+import datetime
 
 """
 put repeated stuff here that is used in building the models
@@ -34,4 +36,39 @@ class modelutils:
         df['minutes_date'] = pd.to_datetime(df['minutes_date'],format="%Y%m%d")
         df['publish_date'] = pd.to_datetime(df['publish_date'],format="%Y%m%d")
         return df
+
+
+    def getMinutes(minutesDir, df, clean_algo, abortOnFail=False):
+        minutes, publish , data = [], [], []
+        for files in sorted(os.listdir(minutesDir)):
+            f, ext = os.path.splitext(files)
+            minutes.append(datetime.datetime.strptime(f.split("_")[0],"%Y%m%d"))
+            publish.append(datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d"))
+            try:
+                text = clean_algo(open(os.path.join(minutesDir, files)).read().strip())
+                dec = df[df["publish_date"] == publish[-1]].iloc[0]["flag"]
+                data.append([text, dec])
+            except Exception as e:
+                print("exception reading minutes, file %s" % files)
+                print(e)
+                if abortOnFail:
+                    quit()
+            return data, publish
+
+
+    def getStatements(statementsDir, df, clean_algo, abortOnFail=False):
+        statements, data = [], []
+        for files in sorted(os.listdir(statementsDir)):
+            f, ext = os.path.splitext(files)
+            statements.append(datetime.datetime.strptime(f.split(".")[0],'%Y%m%d'))
+            try:
+                text = clean_algo(open(os.path.join(statementsDir,files),encoding='utf-8',errors='ignore').read().strip())
+                dec = df[df["publish_date"] == statements[-1]].iloc[0]["flag"]
+                data.append([text,dec])
+            except Exception as e:
+                print("exception reading statements, file %s" % files)
+                print(e)
+                if abortOnFail:
+                    quit()
+        return data
 
