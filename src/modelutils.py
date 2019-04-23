@@ -15,21 +15,21 @@ class modelutils:
 
     
     def decisionDF(decisionFile):
-        names = ["minutes_date",
-                 "publish_date",
-                 "before",
-                 "after",
-                 "decision",
-                 "flag",
-                 "change"]
+        names = ["MeetingDate",
+                 "MinutesRelease",
+                 "PreviousTarget",
+                 "PostTarget",
+                 "Direction",
+                 "ActionFlag",
+                 "Amount"]
         usecols = [0,1,2,3,4,5,6]
-        dtypes={"minutes_date":'str',
-                "publish_date":'str',
-                "before":'float',
-                "after":'float',
-                "decision":'str',
-                "flag":'float',
-                "change":'float'}
+        dtypes={"MeetingDate":'str',
+                "MinutesRelease":'str',
+                "PreviousTarget":'float',
+                "PostTarget":'float',
+                "Direction":'str',
+                "ActionFlag":'float',
+                "Amount":'float'}
         df = pd.read_csv(decisionFile, 
                          usecols=usecols,
                          header=None, 
@@ -38,56 +38,94 @@ class modelutils:
                          sep=",")
         # done outside of df construction as dateimte conversion can be extremely 
         # slow without a format hint as data size grows
-        df['minutes_date'] = pd.to_datetime(df['minutes_date'],format="%Y%m%d")
-        df['publish_date'] = pd.to_datetime(df['publish_date'],format="%Y%m%d")
+        df['MeetingDate'] = pd.to_datetime(df['MeetingDate'],format="%Y%m%d")
+        df['MinutesRelease'] = pd.to_datetime(df['MinutesRelease'],format="%Y%m%d")
         return df
 
-
+    """
+    return FedMinutes as pandas DataFrame
+    """
     def getMinutes(minutesDir, df, clean_algo, abortOnFail=False):
-        publish , data = [], []
+        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
         for files in sorted(os.listdir(minutesDir)):
             f, ext = os.path.splitext(files)
             try:
                 # commented out for now as its not used 
                 #minutes_date = datetime.datetime.strptime(f.split("_")[0],"%Y%m%d")
-                publish_date = datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d")
+                release_date = datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d")
                 text = clean_algo(open(os.path.join(minutesDir, files)).read().strip())
-                dec = df[df["publish_date"] == publish_date].iloc[0]["flag"]
-                data.append([text, dec])
-                publish.append(publish_date)
+                action = df[df["MinutesRelease"] == release_date].iloc[0]["ActionFlag"]
+                change = df[df["MinutesRelease"] == release_date].iloc[0]["Amount"]
+                data["meetingDate"].append(release_date)
+                data["year"].append(release_date.year)
+                data["doctext"].append(text)
+                data["actionFlag"].append(action)
+                data["rateChange"].append(change)
+                data["documentType"].append("minutes")
             except Exception as e:
                 print("exception reading minutes, file %s" % files)
                 print(e)
                 if abortOnFail:
                     quit()
-        return data, publish
+        return pd.DataFrame(data)
 
 
-    def getStatements(statementsDir, df, clean_algo, abortOnFail=False, debug=False):
-        cleanedStatementV, dateV = [], df["publish_date"].values
+    def getStatements(statementsDir, df, clean_algo, abortOnFail=False):
+        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
         for files in sorted(os.listdir(statementsDir)):
             f, ext = os.path.splitext(files)
             try:
                 statement_date = datetime.datetime.strptime(f.split(".")[0],'%Y%m%d') 
-                dt64 = modelutils.to_np64(statement_date)
-                ix = modelutils.get_ge(dateV, dt64)
-                decision = df.loc[ix]["flag"]
-                if debug :
-                    print("getStatements debug", df.loc[ix]["publish_date"], ix, statement_date, decision)
+                ix = modelutils.get_ix(df["MinutesRelease"].values, statement_date)
+                action = df.loc[ix]["ActionFlag"]
+                change = df.loc[ix]["Amount"]
                 text = clean_algo(open(os.path.join(statementsDir,files),encoding='utf-8',errors='ignore').read().strip())
-                cleanedStatementV.append([text,decision])
+                data["meetingDate"].append(statement_date)
+                data["year"].append(statement_date.year)
+                data["doctext"].append(text)
+                data["actionFlag"].append(action)
+                data["rateChange"].append(change)
+                data["documentType"].append("statements")
             except Exception as e:
                 print("exception reading statements, file %s" % files)
                 print(e)
                 if abortOnFail:
                     quit()
-        return cleanedStatementV
+        return pd.DataFrame(data)
 
-    def get_ge(datesV, date):
-        return bisect.bisect_right(datesV, date)
 
-    def get_lt(datesV, date):
-        return bisect.bisect_left(datesV, date) - 1
+    def getSpeeches(speechesDir, df, clean_algo, abortOnFail=False):
+        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
+        for files in sorted(os.listdir(speechesDir)):
+            f, ext = os.path.splitext(files)
+            try:
+                speech_date = datetime.datetime.strptime(f.split("_")[0],'%Y%m%d') 
+                ix = modelutils.get_ix(df["MinutesRelease"].values, speech_date)
+                action = df.loc[ix]["ActionFlag"]
+                change = df.loc[ix]["Amount"]
+                text = clean_algo(open(os.path.join(speechesDir,files),encoding='utf-8',errors='ignore').read().strip())
+                data["meetingDate"].append(speech_date)
+                data["year"].append(speech_date.year)
+                data["doctext"].append(text)
+                data["actionFlag"].append(action)
+                data["rateChange"].append(change)
+                data["documentType"].append("speeches")
+            except Exception as e:
+                print("exception reading statements, file %s" % files)
+                print(e)
+                if abortOnFail:
+                    quit()
+        return pd.DataFrame(data)
+
+    def get_ix(dateV, date):
+        dt64 = modelutils.to_np64(date)
+        return modelutils.get_ge(dateV, dt64)
+
+    def get_ge(dateV, date):
+        return bisect.bisect_right(dateV, date)
+
+    def get_lt(dateV, date):
+        return bisect.bisect_left(dateV, date) - 1
 
     def to_dt(date): # convert a np.datetime64 to a datetime.datetime
         if type(date) == datetime.datetime : return date
