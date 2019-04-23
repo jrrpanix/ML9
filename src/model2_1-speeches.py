@@ -129,6 +129,7 @@ if __name__ == '__main__':
     parser.add_argument('--Niter', default=10, type=int)
     parser.add_argument('--cleanAlgo', default="complex")
     parser.add_argument('--ngram', nargs='+', default=['2,2'])
+    parser.add_argument('--SpeechYear', default=2018, type=int)
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     df = decisionDF(args.decision)
     data, publish = getMinutes(args.minutes, df, clean_algo)
     data_statements = getStatements(args.statements, df, clean_algo)
-    data_speeches = getSpeeches(2018)
+    data_speeches = getSpeeches(args.SpeechYear)
     N = len(data)
     # Train on current minutes
     models=[("svm",LinearSVC()),
@@ -148,7 +149,7 @@ if __name__ == '__main__':
 
     print("Determining Fed Action from minutes")
     print("%-20s %5s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
-    N = N + int(len(data_statements))
+    N = N + int(len(data_statements)) + int(len(data_speeches))
     for ngram in ngrams:
         results= runModels(models, data, data_statements, data_speeches, Niter, pctTrain, ngram)
         #pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
