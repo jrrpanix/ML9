@@ -5,6 +5,7 @@ import numpy as np
 import bisect
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 
 
 """
@@ -138,23 +139,9 @@ class modelutils:
     def to_days(x):
         return x.astype('timedelta64[D]')/np.timedelta64(1, 'D')
 
-
     def splitTrainTest(data_sets, train_pct):
-        def isMultipleDataSets(data_sets):
-            for d in data_sets:
-                # first line is 2 elements and has decision variable
-                if len(d) == 2 and d[1] < 3: return False
-                return True
-        combined = data_sets
-        if isMultipleDataSets(data_sets):
-            combined = data_sets[0]
-            for i in range(1,len(data_sets)):
-                combined.extend(data_sets[i])
-        Ntrain = int(len(combined)* train_pct)
-        np.random.shuffle(combined)
-        train_data = pd.DataFrame(combined[0:Ntrain],columns=['text', 'sentiment'])
-        test_data = pd.DataFrame(combined[Ntrain:], columns=['text', 'sentiment'])
-        return train_data, test_data
+        combined = pd.concat(data_sets) if type(data_sets) is list else data_sets
+        return train_test_split(combined, test_size=1.0-train_pct)
 
     def getFeatures(train_data, test_data, ngram):
         vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
