@@ -28,7 +28,7 @@ from modelutils import modelutils
 
 
 def runModels(models, model_data_set, Nitr, pctTrain, ngram):
-    results=[]
+    results, trainPos, testPos=[], np.zeros(Nitr), np.zeros(Nitr)
     for iter in range(Nitr):
         train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
         training_features, test_features = modelutils.getFeatures(train_data, test_data, ngram)
@@ -40,7 +40,9 @@ def runModels(models, model_data_set, Nitr, pctTrain, ngram):
             if iter == 0:
                 results.append(np.zeros(Nitr))
             results[i][iter]=acc
-    return results
+        trainPos[iter] = train_data["ActionFlag"].sum()/ len(train_data)
+        testPos[iter] = test_data["ActionFlag"].sum()/ len(test_data)
+    return results, trainPos, testPos
                 
 
 if __name__ == '__main__':
@@ -94,15 +96,15 @@ if __name__ == '__main__':
             ("Naive Bayes",MultinomialNB())]
 
     print("Determining Fed Action from minutes")
-    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s" % 
-          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets"))
+    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s" % 
+          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP"))
     for ngram in ngrams:
-        results= runModels(models, data_set, Niter, pctTrain, ngram)
+        results, trainPos, testPos = runModels(models, data_set, Niter, pctTrain, ngram)
         ngramstr = str(ngram[0]) + ":" + str(ngram[1])
         for m, r in zip(models, results):
             name, mu, s = m[0], np.mean(r), np.std(r) 
-            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s" % 
-                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel))
+            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f" % 
+                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos)))
         print("")
             
 
