@@ -1,4 +1,4 @@
-Share Accessible Keys for Video[Space Bar]toggles play/pause;[Right/Left Arrows]seeks the video forwards and back (5 sec );[Up/Down Arrows]increase/decrease volume;[M]toggles mute on/off;[F]toggles fullscreen on/off (Except IE 11);The[Tab]key may be used in combination with the[Enter/Return]key to navigate and activate control buttons, such as caption on/off.var my Player;
+Accessible Keys for Video[Space Bar]toggles play/pause;[Right/Left Arrows]seeks the video forwards and back (5 sec );[Up/Down Arrows]increase/decrease volume;[M]toggles mute on/off;[F]toggles fullscreen on/off (Except IE 11);The[Tab]key may be used in combination with the[Enter/Return]key to navigate and activate control buttons, such as caption on/off.var my Player;
             videojs('frb-video7030').ready(function() {
                 my Player = this;
                 my Player.on('loadstart',function(){

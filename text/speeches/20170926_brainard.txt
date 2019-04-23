@@ -1,4 +1,4 @@
-Share Math Jax.Hub.Config({
+Math Jax.Hub.Config({
 extensions: ["tex2jax.js"],
 jax: ["input/Te X", "output/HTML-CSS"],
 tex2jax: {
