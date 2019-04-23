@@ -145,7 +145,9 @@ class modelutils:
 
     def getFeatures(train_data, test_data, ngram):
         vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
-        training_features = vectorizer.fit_transform(train_data["text"])                                 
-        test_features = vectorizer.transform(test_data["text"])
+        training_features = vectorizer.fit_transform(train_data["doctext"])                                 
+        test_features = vectorizer.transform(test_data["doctext"])
         return training_features, test_features
 
+    def getBounds(datadf):
+        return (len(datadf), modelutils.to_dt(datadf["meetingDate"].min()), modelutils.to_dt(datadf["meetingDate"].max()))
