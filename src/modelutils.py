@@ -43,11 +43,20 @@ class modelutils:
         df['MinutesRelease'] = pd.to_datetime(df['MinutesRelease'],format="%Y%m%d")
         return df
 
+    def updateData(data, minutesReleaseDate, docDate, docText, action, amount, docType):
+        data["MinutesRelease"].append(minutesReleaseDate)
+        data["DocDate"].append(docDate)
+        data["Year"].append(docDate.year)
+        data["DocText"].append(docText)
+        data["ActionFlag"].append(action)
+        data["Amount"].append(amount)
+        data["DocumentType"].append(docType)
+
     """
     return FedMinutes as pandas DataFrame
     """
     def getMinutes(minutesDir, df, clean_algo, abortOnFail=False):
-        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
+        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
         for files in sorted(os.listdir(minutesDir)):
             f, ext = os.path.splitext(files)
             try:
@@ -56,13 +65,8 @@ class modelutils:
                 release_date = datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d")
                 text = clean_algo(open(os.path.join(minutesDir, files)).read().strip())
                 action = df[df["MinutesRelease"] == release_date].iloc[0]["ActionFlag"]
-                change = df[df["MinutesRelease"] == release_date].iloc[0]["Amount"]
-                data["meetingDate"].append(release_date)
-                data["year"].append(release_date.year)
-                data["doctext"].append(text)
-                data["actionFlag"].append(action)
-                data["rateChange"].append(change)
-                data["documentType"].append("minutes")
+                amount = df[df["MinutesRelease"] == release_date].iloc[0]["Amount"]
+                modelutils.updateData(data, release_date, release_date, text, action, amount, "minutes")
             except Exception as e:
                 print("exception reading minutes, file %s" % files)
                 print(e)
@@ -72,21 +76,17 @@ class modelutils:
 
 
     def getStatements(statementsDir, df, clean_algo, abortOnFail=False):
-        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
+        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
         for files in sorted(os.listdir(statementsDir)):
             f, ext = os.path.splitext(files)
             try:
                 statement_date = datetime.datetime.strptime(f.split(".")[0],'%Y%m%d') 
                 ix = modelutils.get_ix(df["MinutesRelease"].values, statement_date)
+                release_date = df.loc[ix]["MinutesRelease"]
                 action = df.loc[ix]["ActionFlag"]
-                change = df.loc[ix]["Amount"]
+                amount = df.loc[ix]["Amount"]
                 text = clean_algo(open(os.path.join(statementsDir,files),encoding='utf-8',errors='ignore').read().strip())
-                data["meetingDate"].append(statement_date)
-                data["year"].append(statement_date.year)
-                data["doctext"].append(text)
-                data["actionFlag"].append(action)
-                data["rateChange"].append(change)
-                data["documentType"].append("statements")
+                modelutils.updateData(data, release_date, statement_date, text, action, amount, "statements")
             except Exception as e:
                 print("exception reading statements, file %s" % files)
                 print(e)
@@ -96,21 +96,17 @@ class modelutils:
 
 
     def getSpeeches(speechesDir, df, clean_algo, abortOnFail=False):
-        data={"meetingDate":[], "year":[], "doctext":[], "actionFlag":[], "rateChange":[], "documentType":[]}
+        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
         for files in sorted(os.listdir(speechesDir)):
             f, ext = os.path.splitext(files)
             try:
                 speech_date = datetime.datetime.strptime(f.split("_")[0],'%Y%m%d') 
                 ix = modelutils.get_ix(df["MinutesRelease"].values, speech_date)
+                release_date = df.loc[ix]["MinutesRelease"]
                 action = df.loc[ix]["ActionFlag"]
-                change = df.loc[ix]["Amount"]
+                amount = df.loc[ix]["Amount"]
                 text = clean_algo(open(os.path.join(speechesDir,files),encoding='utf-8',errors='ignore').read().strip())
-                data["meetingDate"].append(speech_date)
-                data["year"].append(speech_date.year)
-                data["doctext"].append(text)
-                data["actionFlag"].append(action)
-                data["rateChange"].append(change)
-                data["documentType"].append("speeches")
+                modelutils.updateData(data, release_date, speech_date, text, action, amount, "speeches")
             except Exception as e:
                 print("exception reading statements, file %s" % files)
                 print(e)
@@ -145,9 +141,9 @@ class modelutils:
 
     def getFeatures(train_data, test_data, ngram):
         vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
-        training_features = vectorizer.fit_transform(train_data["doctext"])                                 
-        test_features = vectorizer.transform(test_data["doctext"])
+        training_features = vectorizer.fit_transform(train_data["DocText"])                                 
+        test_features = vectorizer.transform(test_data["DocText"])
         return training_features, test_features
 
     def getBounds(datadf):
-        return (len(datadf), modelutils.to_dt(datadf["meetingDate"].min()), modelutils.to_dt(datadf["meetingDate"].max()))
+        return (len(datadf), modelutils.to_dt(datadf["DocDate"].min()), modelutils.to_dt(datadf["DocDate"].max()))

@@ -28,19 +28,15 @@ from modelutils import modelutils
 
 
 def runModels(models, model_data_set, Nitr, pctTrain, ngram):
-    def pctPos(tdata):
-        tl, tpos = len(tdata), tdata['sentiment'].sum()
-        print(tl, tpos, tpos/tl)
-
     results=[]
     for iter in range(Nitr):
         train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
         training_features, test_features = modelutils.getFeatures(train_data, test_data, ngram)
         for i, m in enumerate(models):
             model=m[1]
-            model.fit(training_features, train_data["actionFlag"])
+            model.fit(training_features, train_data["ActionFlag"])
             y_pred = model.predict(test_features)
-            acc = accuracy_score(test_data["actionFlag"], y_pred)
+            acc = accuracy_score(test_data["ActionFlag"], y_pred)
             if iter == 0:
                 results.append(np.zeros(Nitr))
             results[i][iter]=acc
