@@ -16,6 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 import matplotlib.pyplot as plt
 import csv
+from modelutils import modelutils
 
 # this version allows for multiple fit methods (SVM, Logistic, Logistic Lasso)
 # this method also computes the mean and std deviation of the accuracy by
@@ -25,72 +26,16 @@ import csv
 
 # python ./model2_0.py --ngram 1,1 2,2 3,3 1,3 2,3 --Niter 50 --pctTrain .8
 
-def decisionDF(decisionFile):
-    names = ["minutes_date","publish_date","before","after","decision","flag","change"]
-    usecols = [0,1,2,3,4,5,6]
-    dtypes={"minutes_date":'str',"publish_date":'str',"before":'float',"after":'float',
-            "decision":'str',"flag":'float',"change":'float'}
-    df = pd.read_csv(decisionFile, 
-                     usecols=usecols,
-                     header=None, 
-                     names=names,
-                     dtype=dtypes,
-                     sep=",")
-    df['minutes_date'] = pd.to_datetime(df['minutes_date'],format="%Y%m%d")
-    df['publish_date'] = pd.to_datetime(df['publish_date'],format="%Y%m%d")
-    return df
 
-def getMinutes(minutesDir, decisionDF, clean_algo):
-    minutes, publish , data = [], [], []
-    for files in sorted(os.listdir(minutesDir)):
-        f, ext = os.path.splitext(files)
-        minutes.append(datetime.datetime.strptime(f.split("_")[0],"%Y%m%d"))
-        publish.append(datetime.datetime.strptime(f.split("_")[-1],"%Y%m%d"))
-        try:
-            text = clean_algo(open(os.path.join(minutesDir, files)).read().strip())
-            dec = df[df["publish_date"] == publish[-1]].iloc[0]["flag"]
-            data.append([text, dec])
-        except Exception as e:
-            print("exception reading file %s" % files)
-            print(e)
-            quit()
-    return data, publish
+def runModels(models, model_data_set, Nitr, pctTrain, ngram):
+    def pctPos(tdata):
+        tl, tpos = len(tdata), tdata['sentiment'].sum()
+        print(tl, tpos, tpos/tl)
 
-def getStatements(statementsDir, decisionDF, clean_algo):
-    statements, data = [], []
-    for files in sorted(os.listdir(statementsDir)):
-      f, ext = os.path.splitext(files)
-      statements.append(datetime.datetime.strptime(f.split(".")[0],'%Y%m%d'))
-      try:
-        text = clean_algo(open(os.path.join(statementsDir,files),encoding='utf-8',errors='ignore').read().strip())
-        dec = df[df["publish_date"] == publish[-1]].iloc[0]["flag"]
-        data.append([text,dec])
-      except Exception as e:
-        print("exception reading file %s" % files)
-        print(e)
-        quit()
-    return data
-
-def splitTrainTest(data, data_statements, trainPct):
-    np.random.shuffle(data)
-    Ntrain = int(len(data)*args.pctTrain)
-    train_data = pd.DataFrame(data[0:Ntrain],columns=['text', 'sentiment'])
-    train_data = train_data.append(pd.DataFrame(data_statements,columns=['text','sentiment']))
-    test_data = pd.DataFrame(data[Ntrain:], columns=['text', 'sentiment'])
-    return train_data, test_data
-
-def getFeatures(train_data, test_data, ngram):
-    vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
-    #vectorizer = TfidfVectorizer(stop_words="english",preprocessor=None,ngram_range=ngram)
-    training_features = vectorizer.fit_transform(train_data["text"])                                 
-    test_features = vectorizer.transform(test_data["text"])
-    return training_features, test_features
-
-def runModels(models, data, data_statements, Nitr, pctTrain, ngram):
     results=[]
     for iter in range(Nitr):
-        train_data, test_data = splitTrainTest(data, data_statements, pctTrain)
-        training_features, test_features = getFeatures(train_data, test_data, ngram)
+        train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
+        training_features, test_features = modelutils.getFeatures(train_data, test_data, ngram)
         for i, m in enumerate(models):
             model=m[1]
             model.fit(training_features, train_data["sentiment"])
@@ -118,22 +63,23 @@ if __name__ == '__main__':
 
     clean_algo = complex_clean if args.cleanAlgo == "complex" else simple_clean
     pctTrain, cleanA, Niter, ngram = args.pctTrain, args.cleanAlgo, args.Niter, args.ngram
-    df = decisionDF(args.decision)
-    data, publish = getMinutes(args.minutes, df, clean_algo)
-    data_statements = getStatements(args.statements, df, clean_algo)
-    N = len(data)
+    df = modelutils.decisionDF(args.decision)
+    minutes, publish = modelutils.getMinutes(args.minutes, df, clean_algo)
+    statements = modelutils.getStatements(args.statements, df, clean_algo)
+
     # Train on current minutes
-    models=[("svm",LinearSVC()),
-            ("logistic",LogisticRegression(solver='liblinear')),
-            ("logistic_lasso",LogisticRegression(penalty='l1',solver='liblinear')),
+    solver='liblinear'
+    max_iter=20000 
+    models=[("svm",LinearSVC(max_iter=max_iter)),
+            ("logistic",LogisticRegression(solver=solver,max_iter=max_iter)),
+            ("logistic_lasso",LogisticRegression(penalty='l1',solver=solver,max_iter=max_iter)),
             ("Naive Bayes",MultinomialNB())]
 
     print("Determining Fed Action from minutes")
     print("%-20s %5s %5s %10s %10s %5s %8s %6s %10s %10s" % ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end"))
-    N = N + int(len(data_statements))
+    N = len(minutes) + len(statements)
     for ngram in ngrams:
-        results= runModels(models, data, data_statements, Niter, pctTrain, ngram)
-        #pctTrain = (int(len(data)*0.75) + int(len(data_statements))) / (int(len(data)) + int(len(data_statements)))
+        results= runModels(models, [minutes, statements], Niter, pctTrain, ngram)
         start, end = publish[0].strftime("%m/%d/%Y"), publish[-1].strftime("%m/%d/%Y")
         ngramstr = str(ngram[0]) + ":" + str(ngram[1])
         for m, r in zip(models, results):
