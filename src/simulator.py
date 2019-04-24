@@ -9,6 +9,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 
 #
+# Code simulator
+
+#
 # This run random experiments to detect sentimate in randomly generated text
 #
 # Overview 
