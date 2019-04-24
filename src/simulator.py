@@ -112,9 +112,9 @@ def fitData(train_data, test_data, modelType="svc"):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Project')
-    parser.add_argument('--common', default="./20k.txt")
-    parser.add_argument('--positive', default="./pos_words.txt")
-    parser.add_argument('--negative', default="./neg_words.txt")
+    parser.add_argument('--common', default="../simdata/20k.txt")
+    parser.add_argument('--positive', default="../simdata/pos_words.txt")
+    parser.add_argument('--negative', default="../simdata/neg_words.txt")
     parser.add_argument('-n','--N', default=50, type=int)
     parser.add_argument('-t','--trials', default=3, type=int)
     parser.add_argument('-l','--textLen', default=60, type=int)
