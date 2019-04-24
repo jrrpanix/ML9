@@ -63,15 +63,15 @@ def loadWords(commonFile="./20k.txt", positiveFile="./pos_words.txt", negativeFi
 # output 
 # returns randomly shuffeled nparray ([text0, score0], [text1, score1], ... [textN-1, scoreN-1])
 # where text_i is either postive or negative
-def generateData(common_words, pos_words, neg_words, N, textLen, pctSen, pos_score=1, neg_score=0):
+def generateData(common_words, pos_words, neg_words, NSamples, textLen, pctSen, pos_score=1, neg_score=0):
     def genText(Ncommon, common_words, Nsen, sen_words):
         words=np.concatenate((np.random.choice(sen_words, Nsen), np.random.choice(common_words, Ncommon)))
         np.random.shuffle(words)
         return " ".join(words[i] for i in range(len(words)))
     Nsen = int(textLen*pctSen)
     Ncommon = textLen - Nsen
-    pos_data = [[genText(Ncommon, common_words, Nsen, pos_words),pos_score] for i in range(N)]
-    neg_data = [[genText(Ncommon, common_words, Nsen, neg_words),neg_score] for i in range(N)]
+    pos_data = [[genText(Ncommon, common_words, Nsen, pos_words),pos_score] for i in range(NSamples)]
+    neg_data = [[genText(Ncommon, common_words, Nsen, neg_words),neg_score] for i in range(NSamples)]
     all_data = np.concatenate((pos_data, neg_data))
     np.random.shuffle(all_data)
     return all_data
