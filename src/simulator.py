@@ -120,14 +120,14 @@ if __name__ == '__main__':
     parser.add_argument('-l','--textLen', default=60, type=int)
     parser.add_argument('-s','--pctSen', help='pct of sentiment words in the text', default=0.10, type=float)
     parser.add_argument('-p','--pctTrain', help='pct of sample for training', default=0.75, type=float)
+    parser.add_argument('--stp', help='stepsize', default=10, type=int)
     args = parser.parse_args()
 
 
     common, pos, neg = loadWords(args.common, args.positive, args.negative)
-    T, N, textLen, pctSen, pctTrain = args.trials, args.N, args.textLen, args.pctSen, args.pctTrain
+    T, N, textLen, pctSen, pctTrain, stp = args.trials, args.N, args.textLen, args.pctSen, args.pctTrain, args.stp
     
     print("%10s, %10s, %10s, %10s, %10s, %10s, %10s" %('T','N',' TextLen', 'PctSen', 'PctTrain', 'mean(acc)', 'std(acc)'))
-    stp=40
     S = int(textLen/stp)
     L, Asvm, Alog, Aloglasso = np.zeros(S), np.zeros(S), np.zeros(S), np.zeros(S)
     # vary textLen
