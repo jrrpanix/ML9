@@ -1,0 +1,10 @@
+DATA Sources for following files
+
+20k.txt
+curl https://raw.githubusercontent.com/first20hours/google-10000-english/master/20k.txt -o 20k.txt
+
+neg_words.txt
+curl https://gist.githubusercontent.com/mkulakowski2/4289441/raw/dad8b64b307cd6df8068a379079becbb3f91101a/negative-words.txt -o neg_words.tx
+
+pos_words.txt
+curl https://gist.githubusercontent.com/mkulakowski2/4289437/raw/1bb4d7f9ee82150f339f09b5b1a0e6823d633958/positive-words.txt -o pos_words.txt
