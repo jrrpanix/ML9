@@ -116,12 +116,8 @@ class Simulator:
             resdict[name][i]=acc
         return pd.DataFrame(result)
 
-    def run(words, params):
+    def run(words, params, models):
         max_iter, solver = params.max_iter, params.solver
-        models=[("svm",LinearSVC(max_iter=max_iter)),
-                ("logistic",LogisticRegression(solver=solver,max_iter=max_iter)),
-                ("logistic_lasso",LogisticRegression(penalty='l1',solver=solver,max_iter=max_iter)),
-                ("Naive Bayes",MultinomialNB())]
         resdict = {name:np.zeros(params.trials) for (name,model) in models}
         for i in range(params.trials):
             Simulator.trial(words, params, models, resdict, i)
@@ -156,8 +152,29 @@ if __name__ == '__main__':
 
     words = Words.load(args.common, args.negative, args.positive)
     params = Params(args.trials, args.nSamples, args.textLen, args.pctSen, args.pctTrain, args.max_iter, args.solver)
-    res = Simulator.run(words, params)
-    print(res)
+    max_iter, solver = params.max_iter, params.solver
+    models=[("svm",LinearSVC(max_iter=max_iter)),
+            ("logistic",LogisticRegression(solver=solver,max_iter=max_iter)),
+            ("logistic_lasso",LogisticRegression(penalty='l1',solver=solver,max_iter=max_iter)),
+            ("Naive Bayes",MultinomialNB())]
+    
+    # vary pct words
+    pct = np.arange(0.01, 0.5+0.025, .025)
+    sim_res = {name:np.zeros(len(pct)) for (name, model) in models}
+    for i in range(len(pct)):
+        cp = params
+        cp.pctSen = pct[i]
+        sim_i = Simulator.run(words, params, models)
+        for name in sim_res.keys():
+            sim_res[name][i] = sim_i[name].mean()
+    for sim in sim_res:
+            plt.plot(pct, sim_res[sim], label='{}'.format(sim))
+    plt.title("acc vs pct in text")
+    plt.xlabel("pct in txt")
+    plt.ylabel("acc")
+    plt.legend()
+    plt.show()
+
 
 
 
