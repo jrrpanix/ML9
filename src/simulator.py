@@ -138,6 +138,7 @@ if __name__ == '__main__':
             accsvm[i] = fitData(train_data, test_data, modelType='svc')
             acclog[i] = fitData(train_data, test_data, modelType='logistic')
             accloglasso[i] = fitData(train_data, test_data, modelType='logistic_lasso')
+        label=" %Sen={} N={}".format(pctSen, N) 
         Asvm[j] = np.mean(accsvm)
         Alog[j] = np.mean(acclog)
         Aloglasso[j] = np.mean(accloglasso)
@@ -146,9 +147,9 @@ if __name__ == '__main__':
               (T,N, l, pctSen, pctTrain, np.mean(accsvm), np.std(accsvm), np.mean(acclog), np.std(acclog), np.mean(accloglasso), np.std(accloglasso)))
             
 
-    plt.plot(L, Asvm, label='svm')
-    plt.plot(L, Alog, label='logistic')
-    plt.plot(L, Aloglasso, label='logistic_lasso')
+    plt.plot(L, Asvm, label='svm_{}'.format(label))
+    plt.plot(L, Alog, label='logistic_{}'.format(label))
+    plt.plot(L, Aloglasso, label='logistic_lasso_{}'.format(label))
     plt.title("Accuracy vs N Words in Text")
     plt.xlabel("Words in Text")
     plt.ylabel("Accuracy")
