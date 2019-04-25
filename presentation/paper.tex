@@ -51,8 +51,15 @@ The aim of our research is to determine whether ML and NLP methods can be used t
 
 \begin{enumerate}
 
- \item We test the accuracy of ML models trained on FOMC statements and a percentage of FOMC minutes on a test set of FOMC minutes
- \item We create a predictive model that is trained on documents that are temporally released before the test document.  Typically we will test with FOMC minutes releases or Board of Governor speeches.  
+ \item We test the accuracy of ML models trained on a random mixture of FOMC minutes, speeches, and statements on a test set of FOMC documents.  In this stage, we are determining the viability of ML methods in predicting FOMC action on test documents, and we will evaluate the model accuracy with precision and recall.  The models are: 
+ \begin{itemize}
+    \item Naive Bayes
+    \item Logistic Regression 
+    \item SVM
+    \item Logistic Lasso
+ \end{itemize}
+ \item We create a predictive model that is trained on documents that are temporally released before the test document.  Typically we will test with FOMC minutes releases or Board of Governor speeches that are temporally released after the training documents. 
+ \item  
 \end{enumerate}
 
 \section{Methodology}
@@ -86,7 +93,6 @@ The data for the Federal Funds target rate and target range (post 2009) is from 
 Statements are post-meeting communiqu\'e and are generally short, but contains a summary of the committee's reasoning for the decision.  Minutes are longer and contain the Staff and Committee member current economic assessments and outlooks.  The speeches in the corpus are from the Board of Governors and may contain clues of their thoughts on their current economic outlook.  \vertSpace
 
 
-When we train the model with statements and minutes, ten statements will be considered one document because of the magnitude of minute size to statement size.  
 
 \subsection{Scraping and Text Pre-Processing}
 
