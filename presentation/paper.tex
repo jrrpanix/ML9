@@ -13,7 +13,7 @@
 % Document Formatting Packages:
 \usepackage{hyperref}
 \usepackage[margin=1in]{geometry}
-
+\usepackage{graphicx}
 
 \newcommand{\vertSpace}[1]{\vspace{3mm}}
 
@@ -59,7 +59,8 @@ The aim of our research is to determine whether ML and NLP methods can be used t
     \item Logistic Lasso
  \end{itemize}
  \item We create a predictive model that is trained on documents that are temporally released before the test document.  Typically we will test with FOMC minutes releases or Board of Governor speeches that are temporally released after the training documents. 
- \item  
+ \item  To determine the appropriate feature vector size, for example, concatenate the documents associated with a meeting or treat each document separately, we simulated how sentiment analysis performs as the feature vector becomes larger. 
+ \item  We applied Latent Dirichlet Allocation to the entire corpus of speeches and assumed $k=3$ latent topics to explore whether LDA captures the Federal Reserve's mandates of: maximum employment, stable prices, and financial stability. 
 \end{enumerate}
 
 \section{Methodology}
@@ -110,8 +111,31 @@ This formed the bulk of our text pre-processing and it allowed us to essentially
 
 \subsection{Models}
 
-We will provide an overview of how we utilized the following models in our research
+We will provide an overview of how we utilized the following models in our research: 
 
+  \begin{itemize}
+
+    \item Naive Bayes
+    \item Logistic Regression
+    \item Logistic Lasso
+    \item SVM
+    \item Neural Network
+    \item Latent Dirilchet Allocation
+
+  \end{itemize}
+
+\textbf{Latent Dirilchet Allocation}: Given the Federal Reserve's mandates of stable prices, maximum employment, and financial stability, we explored Latent Dirichlet Distribution of the speeches and minutes' word distribution over three latent topics. 
+
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{Topic-Model-3-topics.PNG}
+  \caption{Top 15 Words Distributed Over Three Latent Topics}
+  \label{fig:LDA}
+\end{figure}
+
+We found it interesting that "Topic 1" referred solely to financial stability, "Topic 0" primarily referred to inflation and spending, and "Topic 2" returned a word distribution that included labor, growth, and lower for longer monetary policy. \vertSpace
+
+
+\textbf{Naive Bayes} 
 
 
 % Bibliography
