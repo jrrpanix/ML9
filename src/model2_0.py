@@ -58,6 +58,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_iter', help="max iterations for sklearn solver", default=25000, type=int)
     parser.add_argument('--solver', help="solver for sklearn algo", default='liblinear')
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
+    parser.add_argument('--stack', action='store_true', default=False)
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -88,6 +89,12 @@ if __name__ == '__main__':
     assert N  > 0, "no data in data_set"
     start, end = start.strftime("%m/%d/%Y"), end.strftime("%m/%d/%Y")
     
+    if args.stack:
+        data_set = modelutils.stackFeatures(data_set)
+        N = len(data_set)
+        stack="True"
+    else:
+        stack="Flase"
 
     # Train on current minutes
     models=[("svm",LinearSVC(max_iter=max_iter)),
@@ -96,15 +103,15 @@ if __name__ == '__main__':
             ("Naive Bayes",MultinomialNB())]
 
     print("Determining Fed Action from minutes")
-    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s" % 
-          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP"))
+    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s %5s" % 
+          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Stack"))
     for ngram in ngrams:
         results, trainPos, testPos = runModels(models, data_set, Niter, pctTrain, ngram)
         ngramstr = str(ngram[0]) + ":" + str(ngram[1])
         for m, r in zip(models, results):
             name, mu, s = m[0], np.mean(r), np.std(r) 
-            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f" % 
-                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos)))
+            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f %5s" % 
+                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), stack))
         print("")
             
 
