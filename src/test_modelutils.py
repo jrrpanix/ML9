@@ -38,3 +38,11 @@ if __name__ == '__main__':
     print(train)
     print("randmoly split test set")
     print(test)
+
+    #
+    #
+    #
+    data_stacked = modelutils.stackFeatures([mn, st, sp])
+    print("--- all of the features stacked---")
+    print(data_stacked)
+
