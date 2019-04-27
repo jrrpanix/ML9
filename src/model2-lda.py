@@ -66,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_iter', help="max iterations for sklearn solver", default=25000, type=int)
     parser.add_argument('--solver', help="solver for sklearn algo", default='liblinear')
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
+    parser.add_argument('--stack', action='store_true', default=False)
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -94,4 +95,6 @@ if __name__ == '__main__':
         N , start, end = N + N1, min(start, start1), max(end, end1)
     assert N  > 0, "no data in data_set"
     start, end = start.strftime("%m/%d/%Y"), end.strftime("%m/%d/%Y")
+    if args.stack:
+        data_set = [modelutils.stackFeatures(data_set)]
     runModels(data_set)
