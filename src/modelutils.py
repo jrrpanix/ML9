@@ -121,6 +121,25 @@ class modelutils:
                     quit()
         return pd.DataFrame(data)
 
+    def stackFeatures(data_set):
+            c = pd.concat(data_set)
+            g=c.groupby(['MinutesRelease']).agg({'MinutesRelease':['min'],
+                                                 'DocDate':['min','max'],
+                                                 'Year':['min'],
+                                                 'ActionFlag':['max'],
+                                                 'Amount' : ['mean'],
+                                                 'Direction': lambda x : '_'.join(x),
+                                                 'DocText': lambda x : ' '.join(x),
+                                                 'DocumentType': lambda x : ' '.join(x)})
+            dirV = g['Direction']['<lambda>'].values
+            return pd.DataFrame({'MinutesRelease':g['MinutesRelease']['min'].values,
+                                 'DocDate':g['DocDate']['min'].values,
+                                 'Year':g['Year']['min'].values,
+                                 'ActionFlag':g['ActionFlag']['max'].values,
+                                 'Direction':[dirV[i].split("_")[0] for i in range(len(dirV))],
+                                 'DocText':g['DocText']['<lambda>'].values,
+                                 'DocumentType':g['DocumentType']['<lambda>'].values})
+
     def get_ix(dateV, date):
         dt64 = modelutils.to_np64(date)
         return modelutils.get_ge(dateV, dt64)
