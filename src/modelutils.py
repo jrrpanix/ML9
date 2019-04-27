@@ -43,20 +43,24 @@ class modelutils:
         df['MinutesRelease'] = pd.to_datetime(df['MinutesRelease'],format="%Y%m%d")
         return df
 
-    def updateData(data, minutesReleaseDate, docDate, docText, action, amount, docType):
+    def updateData(data, minutesReleaseDate, docDate, docText, action, amount, direction, docType):
         data["MinutesRelease"].append(minutesReleaseDate)
         data["DocDate"].append(docDate)
         data["Year"].append(docDate.year)
         data["DocText"].append(docText)
         data["ActionFlag"].append(action)
         data["Amount"].append(amount)
+        data["Direction"].append(direction)
         data["DocumentType"].append(docType)
+
+    def getDataCols():
+        return {"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "Direction":[], "DocumentType":[]}
 
     """
     return FedMinutes as pandas DataFrame
     """
     def getMinutes(minutesDir, df, clean_algo, abortOnFail=False):
-        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
+        data = modelutils.getDataCols()
         for files in sorted(os.listdir(minutesDir)):
             f, ext = os.path.splitext(files)
             try:
@@ -66,7 +70,8 @@ class modelutils:
                 text = clean_algo(open(os.path.join(minutesDir, files)).read().strip())
                 action = df[df["MinutesRelease"] == release_date].iloc[0]["ActionFlag"]
                 amount = df[df["MinutesRelease"] == release_date].iloc[0]["Amount"]
-                modelutils.updateData(data, release_date, release_date, text, action, amount, "minutes")
+                direction = df[df["MinutesRelease"] == release_date].iloc[0]["Direction"] 
+                modelutils.updateData(data, release_date, release_date, text, action, amount, direction, "minutes")
             except Exception as e:
                 print("exception reading minutes, file %s" % files)
                 print(e)
@@ -76,7 +81,7 @@ class modelutils:
 
 
     def getStatements(statementsDir, df, clean_algo, abortOnFail=False):
-        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
+        data = modelutils.getDataCols()
         for files in sorted(os.listdir(statementsDir)):
             f, ext = os.path.splitext(files)
             try:
@@ -85,8 +90,9 @@ class modelutils:
                 release_date = df.loc[ix]["MinutesRelease"]
                 action = df.loc[ix]["ActionFlag"]
                 amount = df.loc[ix]["Amount"]
+                direction = df[df["MinutesRelease"] == release_date].iloc[0]["Direction"]
                 text = clean_algo(open(os.path.join(statementsDir,files),encoding='utf-8',errors='ignore').read().strip())
-                modelutils.updateData(data, release_date, statement_date, text, action, amount, "statements")
+                modelutils.updateData(data, release_date, statement_date, text, action, amount, direction, "statements")
             except Exception as e:
                 print("exception reading statements, file %s" % files)
                 print(e)
@@ -96,7 +102,7 @@ class modelutils:
 
 
     def getSpeeches(speechesDir, df, clean_algo, abortOnFail=False):
-        data={"MinutesRelease":[],"DocDate":[], "Year":[], "DocText":[], "ActionFlag":[], "Amount":[], "DocumentType":[]}
+        data = modelutils.getDataCols()
         for files in sorted(os.listdir(speechesDir)):
             f, ext = os.path.splitext(files)
             try:
@@ -105,8 +111,9 @@ class modelutils:
                 release_date = df.loc[ix]["MinutesRelease"]
                 action = df.loc[ix]["ActionFlag"]
                 amount = df.loc[ix]["Amount"]
+                direction = df[df["MinutesRelease"] == release_date].iloc[0]["Direction"]
                 text = clean_algo(open(os.path.join(speechesDir,files),encoding='utf-8',errors='ignore').read().strip())
-                modelutils.updateData(data, release_date, speech_date, text, action, amount, "speeches")
+                modelutils.updateData(data, release_date, speech_date, text, action, amount, direction, "speeches")
             except Exception as e:
                 print("exception reading statements, file %s" % files)
                 print(e)
