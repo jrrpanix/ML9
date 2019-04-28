@@ -14,7 +14,8 @@
 \usepackage{hyperref}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
-
+\usepackage{caption}
+\usepackage{subcaption}
 \newcommand{\vertSpace}[1]{\vspace{3mm}}
 
 %-----------------------------------------------------------------
@@ -109,9 +110,27 @@ After scraping the data, we pre-processed the text by removing all punctuation, 
 This formed the bulk of our text pre-processing and it allowed us to essentially utilize the stored text in the document-term matrix for NLP and ML models. 
 
 
+
 \subsection{Models}
 
-We will provide an overview of how we utilized the following models in our research: 
+\subsubsection{Latent Dirichlet Allocation}
+
+We explored latent topic modelling in our research to determine how a machine learning algorithm would classify $k=3$ topics, a proxy for the Federal Reserve's three objectives. \vertSpace
+
+
+Given the Federal Reserve's mandates of stable prices, maximum employment, and financial stability, we explored Latent Dirichlet Distribution of the speeches and minutes' word distribution over three latent topics.  We were interested in exploring how well a topic model would distribute words over the three objectives and if the meaning of the distributions were relatively clear.  
+
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{Topic-Model-3-topics.PNG}
+  \caption{Top 15 Words Distributed Over Three Latent Topics}
+  \label{fig:LDA}
+\end{figure}
+
+We found that the topic model generally distributed the speeches and minutes into the three categories fairly well.  It was interesting that "Topic 1" referred solely to financial stability, "Topic 0" primarily referred to inflation and spending, and "Topic 2" returned a word distribution that included labor, growth, and lower for longer monetary policy. \vertSpace
+
+\subsubsection{Supervised Models}
+
+We utilized the following models in our research: 
 
   \begin{itemize}
 
@@ -120,24 +139,56 @@ We will provide an overview of how we utilized the following models in our resea
     \item Logistic Lasso
     \item SVM
     \item Neural Network
-    \item Latent Dirilchet Allocation
 
   \end{itemize}
 
-\textbf{Latent Dirilchet Allocation}: Given the Federal Reserve's mandates of stable prices, maximum employment, and financial stability, we explored Latent Dirichlet Distribution of the speeches and minutes' word distribution over three latent topics. 
+
+
+\subsubsection{Basic Model Choice and Performance} 
+
+The basic models are Naive Bayes, Logistic Regression, Logistic Lasso, and SVM.  We tested for model accuracy through averaging various iterations of each model's results, and we empirically tested for the optimal number of bigrams and anagrams.  \vertSpace
+
+
+We found that the general accuracy of each model (for bigrams) peaked at around ten iterations of each model.  The F1 score, measured as the accuracy of predicting an FOMC move (up = down = 1) with bigrams, also peaks at around 10 iterations per model. \vertSpace
+
+
+Given that the basic models are predicting binary classification we expected the Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform the best.  Based on empirical knowledge, FOMC rate moves are analyzed in terms of probabilities and the upcoming meeting is judged primarily on the outcome of Fed action or no action.  \vertSpace
+
+
+Despite some good properties of SVM such as, SVM tend to perform better than logistic regression due to the face that SVMs are less sensitive to outliers and SVM try to maximize the margin between the closest support vectors while LR the posterior class probability. SVM generally find a solution which is as fare as possible for the two categories.  SVM provide prediction of 1 or 0, while the Logistic Regression provides a probability were a probability of 0.501 is enough for the prediction of FOMC rate action.  \vertSpace
+
+
+In addition, because this is a binary classification problem, we also exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression with L2 regularization.  \vertSpace 
+
+
+We included Naive Bayes as a benchmark due to prior study of FOMC sentiment analysis using NLP found that Naive Bayes perfomed the best in their study. 
+
+
+
+
 
 \begin{figure}[h!]
-  \includegraphics[width=\linewidth]{Topic-Model-3-topics.PNG}
-  \caption{Top 15 Words Distributed Over Three Latent Topics}
-  \label{fig:LDA}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+\includegraphics[height=2in,width=2in]{../text/data_for_graphs/accuracy.pdf}
+\caption{Accuracy peaks at around 10 iterations}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+\includegraphics[height=2in,width=2in]{../text/data_for_graphs/F1.pdf}
+  \caption{A subfigure}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{F1 also peaks at around 10 iterations}
+\label{fig:test}
 \end{figure}
 
-We found it interesting that "Topic 1" referred solely to financial stability, "Topic 0" primarily referred to inflation and spending, and "Topic 2" returned a word distribution that included labor, growth, and lower for longer monetary policy. \vertSpace
+
+As seen in the graphs above, the Logistic Lasso regression performs the best out of the four basic models.
 
 
-\textbf{Naive Bayes} 
-
-
+ 
 % Bibliography
 %-----------------------------------------------------------------
 \begin{thebibliography}{99}
