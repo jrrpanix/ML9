@@ -163,7 +163,9 @@ In addition, because this is a binary classification problem, we also exptected 
 
 We included Naive Bayes as a benchmark due to prior study of FOMC sentiment analysis using NLP found that Naive Bayes perfomed the best in their study. 
 
+\subsection{Feature Choice}
 
+Based on previous research that applied Naive Bayes to analyzing FOMC transcripts \cite{stanford} ML models performed better with N-grams and performance peaked at tri-grams for Naive Bayes.  In our models, we found that N-grams of greater N saw greater accuracy and lower standard deviation.  
 
 
 
@@ -195,6 +197,7 @@ As seen in the graphs above, the Logistic Lasso regression performs the best out
 
 \bibitem{Cd94} Hansen,Stephen, McMachon, Michael  \emph{Transparency and Deliberation with the FOMC:a Computational Linquistics Approach}, CEPR Discussion Paper, (2014)
 
+\bibitem{stanford} Puri, Indira \emph{USING MACHINE LEARNING TO PREDICT INTEREST RATE CHANGES FROM FEDERAL RESERVE PROCEEDINGS}
 \end{thebibliography}
 
 \end{document}
