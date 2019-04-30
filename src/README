@@ -53,3 +53,4 @@ organizeDocuments.py
 
 conda install pytorch torchvision -c soumith
 For NerualNetModel
+pip install torchtext
