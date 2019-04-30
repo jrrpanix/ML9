@@ -99,6 +99,9 @@ if __name__ == '__main__':
 
     models=[("nn_30_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000))]
     outputDF = []
+    print("Determining Fed Action from minutes")
+    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s %6s %6s %6s %5s" % 
+          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack"))
 
     for ngram in ngrams:
         results, trainPos, testPos, prec, recall, f1 = runModels(models, data_set, Niter, pctTrain, ngram)
