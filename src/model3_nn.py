@@ -8,9 +8,10 @@ import time
 import datetime
 import numpy as np
 import argparse
+import pandas as pd
 from sklearn.neural_network import MLPClassifier  
 from sklearn.metrics import accuracy_score
-
+from sklearn.metrics import precision_recall_fscore_support
 
 from clean import simple_clean
 from clean import complex_clean
@@ -18,6 +19,31 @@ from modelutils import modelutils
 
 # to install pytorch
 # conda install pytorch torchvision -c soumith
+def runModels(models, model_data_set, Nitr, pctTrain, ngram):
+    results, prec,recall,f1, trainPos, testPos=[],[],[],[], np.zeros(Nitr), np.zeros(Nitr)
+    for iter in range(Nitr):
+        train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
+        training_features, test_features = modelutils.getFeatures(train_data, test_data, ngram)
+        for i, m in enumerate(models):
+            model=m[1]
+            model.fit(training_features, train_data["ActionFlag"])
+            y_pred = model.predict(test_features)
+            acc = accuracy_score(test_data["ActionFlag"], y_pred)
+            if iter == 0:
+                results.append(np.zeros(Nitr))
+                prec.append(np.zeros(Nitr))
+                recall.append(np.zeros(Nitr))
+                f1.append(np.zeros(Nitr))
+            results[i][iter]=acc
+            prec_recall = precision_recall_fscore_support(test_data['ActionFlag'].tolist(), y_pred, average='binary') 
+            prec[i][iter] = prec_recall[0]
+            recall[i][iter] = prec_recall[1]
+            f1[i][iter] = prec_recall[2]
+        trainPos[iter] = train_data["ActionFlag"].sum()/ len(train_data)
+        testPos[iter] = test_data["ActionFlag"].sum()/ len(test_data)
+    return results, trainPos, testPos, prec, recall, f1
+
+
 
 
 if __name__ == '__main__':
@@ -71,20 +97,23 @@ if __name__ == '__main__':
     else:
         stack="Flase"
 
-    model_data_set = data_set
-    train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
-    training_features, test_features = modelutils.getFeatures(train_data, test_data, ngrams[0])
+    models=[("nn_30_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000))]
+    outputDF = []
 
+    for ngram in ngrams:
+        results, trainPos, testPos, prec, recall, f1 = runModels(models, data_set, Niter, pctTrain, ngram)
+        ngramstr = str(ngram[0]) + ":" + str(ngram[1])
+        for m, r, t, u, v in zip(models, results, prec, recall, f1):
+            name, mu, s, precMu, recallMu, f1Mu = m[0], np.mean(r), np.std(r), np.mean(t), np.mean(u), np.mean(v)
+            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f  %6.3f %6.3f  %6.3f %5s" % 
+                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), precMu, recallMu, f1Mu, stack))
 
-    #mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)  
-    mlp = MLPClassifier(hidden_layer_sizes=(50, 40, 10), max_iter=1000)  
-    #mlp.fit(X_train, y_train.values.ravel())  
-    mlp.fit(training_features, train_data["ActionFlag"])
-    y_pred = mlp.predict(test_features)
-    acc = accuracy_score(test_data["ActionFlag"], y_pred)            
-    print(acc)
-    #print(len(training_features), len(test_features))
-    #net = FCNet1(100)
+            outputDF.append([name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), precMu, recallMu, f1Mu, stack])
+        print("")
+
+    outputDF = pd.DataFrame(outputDF)
+    outputDF.to_csv('../text/data_for_graphs/model2_anagrams.csv', index=False, header=["Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack"])
+
 
 
 
