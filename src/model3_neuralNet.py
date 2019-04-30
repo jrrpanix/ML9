@@ -8,13 +8,8 @@ import time
 import datetime
 import numpy as np
 import argparse
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.utils.data as udata 
-from torch.autograd import Variable
-import torch
-from torchtext import data
+from sklearn.neural_network import MLPClassifier  
+from sklearn.metrics import accuracy_score
 
 
 from clean import simple_clean
@@ -81,8 +76,6 @@ if __name__ == '__main__':
     training_features, test_features = modelutils.getFeatures(train_data, test_data, ngrams[0])
 
 
-    from sklearn.neural_network import MLPClassifier  
-    from sklearn.metrics import accuracy_score
     #mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)  
     mlp = MLPClassifier(hidden_layer_sizes=(50, 40, 10), max_iter=1000)  
     #mlp.fit(X_train, y_train.values.ravel())  
