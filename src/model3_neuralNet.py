@@ -11,40 +11,18 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.utils.data as data 
+import torch.utils.data as udata 
 from torch.autograd import Variable
+import torch
+from torchtext import data
+
+
 from clean import simple_clean
 from clean import complex_clean
 from modelutils import modelutils
 
 # to install pytorch
 # conda install pytorch torchvision -c soumith
-
-#
-# Neural Net1 Fully Connected
-#
-class FCNet1(nn.Module):
-
-    def __init__(self, N):
-        super(FCNet1, self).__init__()
-
-        # 2 hidden layer NN
-
-        # layer1 x->
-        self.fc1 = nn.Sequential(nn.Linear(N, N), nn.ReLU())
-
-        #layer2 
-        n2 = int(N/2)
-        
-        self.fc2 = nn.Sequential(nn.Linear(N, n2), nn.ReLU())
-
-        #output could do three to predict if raise, lower or hold
-        self.fc3 = nn.Sequential(nn.Linear(n2, 2), nn.Sigmoid())
-
-    def forward(self, X):
-        xo = self.fc1(X)
-        xo = self.fc2(xo)
-        return self.fc2(xo)
 
 
 if __name__ == '__main__':
@@ -60,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_iter', help="max iterations for sklearn solver", default=25000, type=int)
     parser.add_argument('--solver', help="solver for sklearn algo", default='liblinear')
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
+    parser.add_argument('--stack', action='store_true', default=False)
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -89,9 +68,30 @@ if __name__ == '__main__':
 
     assert N  > 0, "no data in data_set"
     start, end = start.strftime("%m/%d/%Y"), end.strftime("%m/%d/%Y")
-
     
-    net = FCNet1(100)
+    if args.stack:
+        data_set = modelutils.stackFeatures(data_set)
+        N = len(data_set)
+        stack="True"
+    else:
+        stack="Flase"
+
+    model_data_set = data_set
+    train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
+    training_features, test_features = modelutils.getFeatures(train_data, test_data, ngrams[0])
+
+
+    from sklearn.neural_network import MLPClassifier  
+    from sklearn.metrics import accuracy_score
+    #mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)  
+    mlp = MLPClassifier(hidden_layer_sizes=(50, 40, 10), max_iter=1000)  
+    #mlp.fit(X_train, y_train.values.ravel())  
+    mlp.fit(training_features, train_data["ActionFlag"])
+    y_pred = mlp.predict(test_features)
+    acc = accuracy_score(test_data["ActionFlag"], y_pred)            
+    print(acc)
+    #print(len(training_features), len(test_features))
+    #net = FCNet1(100)
 
 
 
