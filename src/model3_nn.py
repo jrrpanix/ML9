@@ -97,7 +97,11 @@ if __name__ == '__main__':
     else:
         stack="Flase"
 
-    models=[("nn_30_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000))]
+    models=[("nn_30_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000)),
+            ("nn_40_20_10", MLPClassifier(hidden_layer_sizes=(40, 20, 10), max_iter=1000)),
+            ("nn_40_20_10_2", MLPClassifier(hidden_layer_sizes=(40, 20, 10, 2), max_iter=1000))]
+
+            
     outputDF = []
     print("Determining Fed Action from minutes")
     print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s %6s %6s %6s %5s" % 
