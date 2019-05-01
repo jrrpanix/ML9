@@ -67,6 +67,7 @@ if __name__ == '__main__':
     parser.add_argument('--solver', help="solver for sklearn algo", default='liblinear')
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
     parser.add_argument('--stack', action='store_true', default=False)
+    parser.add_argument('--slow', action='store_true', default=False)
     parser.add_argument('-o','--output', default='../text/data_for_graphs/model2_anagrams.csv')
     args = parser.parse_args()
 
@@ -77,6 +78,10 @@ if __name__ == '__main__':
 
     assert len(datasetlist) > 0, "no data sets specified"
     datasetlabel=":".join(d for d in datasetlist)
+
+    if args.stack == False and max_iter > 100 and args.slow == False:
+        print("warning this is going to run very slowly, max_iter should be lowered below 100, run with --slow to override this warning")
+        quit()
 
     # fed rate decison matrix
     df = modelutils.decisionDF(args.decision)
