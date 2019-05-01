@@ -53,7 +53,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', default=None)
     parser.add_argument('-o','--output', default=None)
-    parser.add_argument('-f','--fit', nargs='+', choices=['svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'], default='logistic_lasso')
+    parser.add_argument('-f','--fit', nargs='+', help= "'svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'", default='logistic_lasso')
     args = parser.parse_args()
     
 

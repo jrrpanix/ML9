@@ -65,6 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
     parser.add_argument('--stack', action='store_true', default=False)
     parser.add_argument('--layers', nargs='+', default=['10,10'])
+    parser.add_argument('-o','--output', default='../text/data_for_graphs/model2_anagrams.csv')
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -126,7 +127,7 @@ if __name__ == '__main__':
         print("")
 
     outputDF = pd.DataFrame(outputDF)
-    outputDF.to_csv('../text/data_for_graphs/model2_anagrams.csv', index=False, header=["Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack"])
+    outputDF.to_csv(args.output, index=False, header=["Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack"])
 
 
 
