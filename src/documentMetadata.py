@@ -61,7 +61,7 @@ def printMetaData(docType,numWords,numDocs,wordVec):
   print('Total Words in '+docType+ ': '+str(numWords) + '\nTotal Docs: '+str(numDocs) + '\nAvg Words Per Doc: ' + str(numWords/numDocs) + '\nStDev: ' + str(statistics.stdev(wordVec, numWords/numDocs))+ '\n')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='SocialNetworks CSV to HDF5')
+    parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('--minutes', default="../text/minutes")
     parser.add_argument('--speeches', default="../text/speeches")
     parser.add_argument('--statements', default="../text/statements")

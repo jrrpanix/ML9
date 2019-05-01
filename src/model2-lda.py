@@ -54,7 +54,7 @@ def runModels(model_data_set):
     print_top_words(lda, tf_feature_names, 15)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='SocialNetworks CSV to HDF5')
+    parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('--decision', default="../text/history/RatesDecision.csv")
     parser.add_argument('--minutes', default="../text/minutes")
     parser.add_argument('--speeches', default="../text/speeches")
