@@ -17,6 +17,10 @@ from clean import simple_clean
 from clean import complex_clean
 from modelutils import modelutils
 
+# example usage
+# run 3 nn first with one hidden layer with 10 units , then one with 2 hidden layers then one with 3 hidden layers
+#python ./model3_nn.py --data minutes statements --layers 10 10,10 10,10,10  --max_iter 100 --stack --ngram 15:15
+
 # to install pytorch
 # conda install pytorch torchvision -c soumith
 def runModels(models, model_data_set, Nitr, pctTrain, ngram):
@@ -53,13 +57,14 @@ if __name__ == '__main__':
     parser.add_argument('--speeches', default="../text/speeches")
     parser.add_argument('--statements', default="../text/statements")
     parser.add_argument('--pctTrain', default=0.75, type=float)
-    parser.add_argument('--Niter', help="number of times to refit data", default=10, type=int)
+    parser.add_argument('--Niter', help="number of times to refit data", default=3, type=int)
     parser.add_argument('--cleanAlgo', default="complex")
     parser.add_argument('--ngram', nargs='+', default=['1,1'])
-    parser.add_argument('--max_iter', help="max iterations for sklearn solver", default=25000, type=int)
+    parser.add_argument('--max_iter', help="max iterations for sklearn solver", default=250, type=int)
     parser.add_argument('--solver', help="solver for sklearn algo", default='liblinear')
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
     parser.add_argument('--stack', action='store_true', default=False)
+    parser.add_argument('--layers', nargs='+', default=['10,10'])
     args = parser.parse_args()
 
     ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
@@ -97,11 +102,12 @@ if __name__ == '__main__':
     else:
         stack="Flase"
 
-    models=[("nn_30_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000)),
-            ("nn_10_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000)),
-            ("nn_10_10_10", MLPClassifier(hidden_layer_sizes=(30, 10), max_iter=1000)),
-            ("nn_40_20_10", MLPClassifier(hidden_layer_sizes=(40, 20, 10), max_iter=1000)),
-            ("nn_40_20_10_2", MLPClassifier(hidden_layer_sizes=(40, 20, 10, 2), max_iter=1000))]
+    models=[]
+    for nn in args.layers:
+        hidden=tuple([int(x) for x in nn.split(",")])
+        model_name = "nn_" + "_".join(x for x in nn.split(","))
+        models.append((model_name,MLPClassifier(hidden_layer_sizes=hidden, max_iter=max_iter)))
+        
 
     outputDF = []
     print("Determining Fed Action from minutes")
