@@ -68,10 +68,16 @@ if __name__ == '__main__':
     parser.add_argument('-o','--output', default='../text/data_for_graphs/model2_anagrams.csv')
     args = parser.parse_args()
 
-    ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in args.ngram]
     clean_algo = complex_clean if args.cleanAlgo == "complex" else simple_clean
     pctTrain, cleanA, Niter, ngram = args.pctTrain, args.cleanAlgo, args.Niter, args.ngram
     solver, max_iter, datasetlist = args.solver, args.max_iter, args.data
+
+    if len(ngram[0].split(':')) > 1 :
+        ngram = ngram[0]
+        lb , ub = int(ngram.split(':')[0]), int(ngram.split(':')[1])
+        ngrams = [(i,i) for i in range(lb, ub+1)]
+    else :
+        ngrams = [(int(x.split(",")[0]),int(x.split(",")[1])) for x in ngram]
 
     assert len(datasetlist) > 0, "no data sets specified"
     datasetlabel=":".join(d for d in datasetlist)
@@ -108,7 +114,7 @@ if __name__ == '__main__':
         hidden=tuple([int(x) for x in nn.split(",")])
         model_name = "nn_" + "_".join(x for x in nn.split(","))
         models.append((model_name,MLPClassifier(hidden_layer_sizes=hidden, max_iter=max_iter)))
-        
+        print("model {}".format(model_name))
 
     outputDF = []
     print("Determining Fed Action from minutes")
