@@ -50,7 +50,17 @@ organizeDocuments.py
    - Organizes documents by row - after pre-processing the text using regular expressions
    - Originally written with numpy, will switch to pandas
 
+model3_nn.py
+   example usage
+   --layers sepcified layers in nn
+   for example 
+   --layers 40,40              # is a nn model with 2 hidden layers with 40 input nodes
+   --layers 20 20,25 20,25,40  # runs 3 separate models model1 has hidden_layers=(10), model2 hidden_layers=(20,25) and model3 hidden_layers=(20,25,40)
 
-conda install pytorch torchvision -c soumith
-For NerualNetModel
-pip install torchtext
+   this command line will run a nn with 2 hidden layers on anagrams 1,1 ... 80,80
+   time python ./model3_nn.py --layers 40,40  --data speeches statements minutes --ngram 1,1 2,2 3,3 5,5 10,10 15,15 20,20 30,30 40,40 60,60 80,80 --stack --max_iter 100 --output ./output_nn40_40.csv
+
+# for installing pytorch stuff
+  conda install pytorch torchvision -c soumith
+  For NerualNetModel
+  pip install torchtext

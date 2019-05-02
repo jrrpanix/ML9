@@ -32,12 +32,14 @@ def fitScore(df, fit, output):
 """
 Compare F1 Scores of the Fits vs NGram Length
 """
-def compareFits(df, fits, output):
+def compareFits(df, fits, output, range):
+    range = int(range) if range is not None  else len(df)
     for f in fits:
         ll = df[df["Model Name"] == f]
+        ll = ll[ll["NGramInt"] <= range]
         x = ll.NGramInt
         f1 = ll.F1
-        plt.plot(x, f1, label='{} F1'.format(f))
+        plt.plot(x, f1, marker='o', label='{} F1'.format(f))
     plt.title('F1 Scores: ' + ','.join(f for f in fits))
     plt.xlabel('NGram Length')
     plt.ylabel('Pct')
@@ -53,6 +55,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', default=None)
     parser.add_argument('-o','--output', default=None)
+    parser.add_argument('-r','--range', default=None)
     parser.add_argument('-f','--fit', nargs='+', help= "'svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'", default='logistic_lasso')
     args = parser.parse_args()
     
@@ -66,7 +69,7 @@ if __name__ == '__main__':
     if len(fits) == 1:
         fitScore(df, fits[0], args.output)
     if len(fits) > 1:
-        compareFits(df, fits, args.output)
+        compareFits(df, fits, args.output, args.range)
 
 
 
