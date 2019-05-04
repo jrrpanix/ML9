@@ -135,11 +135,20 @@ We utilized the following models in our research:
   \begin{itemize}
 
     \item Naive Bayes
-    \item Logistic Regression
-    \item Logistic Lasso
-    \item SVM
-    \item Neural Network
 
+      $$P(A|x_1,x_2,...,x_n) = p(A)\prod_{i=1}^n p(x_i|A)$$
+
+    \item Logistic Regression
+
+     $$A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}$$
+
+    \item Logistic Lasso
+     $$A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1$$
+    \item SVM
+
+     $$\left [\frac{1}{n} \sum_{i=1}^n max(0,1 - y_i(\vec{w} \dot \vec{x_i} - b)) \right] + \lambda ||\vec{w}||^2$$
+    \item Neural Network
+      We test a mixture of wide and deep neural nets. 
   \end{itemize}
 
 
@@ -158,20 +167,32 @@ Given that the basic models are predicting binary classification we expected the
 Despite some good properties of SVM such as, SVM tend to perform better than logistic regression due to the face that SVMs are less sensitive to outliers and SVM try to maximize the margin between the closest support vectors while LR the posterior class probability. SVM generally find a solution which is as fare as possible for the two categories.  SVM provide prediction of 1 or 0, while the Logistic Regression provides a probability were a probability of 0.501 is enough for the prediction of FOMC rate action.  \vertSpace
 
 
-In addition, because this is a binary classification problem, we also exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression with L2 regularization.  \vertSpace 
+In addition, because this is a binary classification problem, we also exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression without any regularization.  \vertSpace 
+
+Given that we are modelling a classification problem, we would expect the performance of the Logistic Lasso model based on the mathematical properties of Logistic Lasso more robust for predicting FOMC rate action.  Logistic regression models the probability distribution of the class label $y$ given a feature vector $x$: 
+
+$$p(y=1|x,\theta) = \sigma(\theta^T x) = \frac{1}{1+\exp(-\theta^Tx)}$$
+
+The L1 regularized logistic regression (Logistic Lasso) is defined as: 
+
+$$\underset{\rm \theta}{\rm min} \sum_{i=1}^M -\log p(y^{(i)}|x^{(i)}; \theta) + \beta ||\theta||$$
+
+L1 regularization has the effect of forcing feature selection, and as we observe the Logistic Lasso model performs best Tri-grams to 7-grams and performance significantly drops with larger Ngrams.  \vertSpace 
 
 
-We included Naive Bayes as a benchmark due to prior study of FOMC sentiment analysis using NLP found that Naive Bayes perfomed the best in their study. 
+Below is the average accuracy of the four basic classifiers (Naive Bayes, SVM, Logistic Regression, and Logistic Lasso) after 10 iterations: 
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/log_lass_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/log_reg_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/NB_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/SVM_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lass_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_reg_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/NB_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_accuracy_more iterations".pdf}
 \end{center}
 \end{figure}
 
+
+\vspace{5cm}
 
 \subsection{Feature Choice}
 
@@ -180,10 +201,10 @@ Based on previous research that applied Naive Bayes to analyzing FOMC transcript
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/log_lasso_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/log_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/naive_bayes_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../text/data_for_graphs/SVM_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1".pdf}
 \end{center}
 \end{figure}
 
