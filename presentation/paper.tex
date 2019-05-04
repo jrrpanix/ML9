@@ -121,7 +121,7 @@ We explored latent topic modelling in our research to determine how a machine le
 Given the Federal Reserve's mandates of stable prices, maximum employment, and financial stability, we explored Latent Dirichlet Distribution of the speeches and minutes' word distribution over three latent topics.  We were interested in exploring how well a topic model would distribute words over the three objectives and if the meaning of the distributions were relatively clear.  
 
 \begin{figure}[h!]
-  \includegraphics[width=\linewidth]{Topic-Model-3-topics.PNG}
+  \includegraphics[width=\linewidth]{../output/data_for_graphs/Topic-Model-3-topics.PNG}
   \caption{Top 15 Words Distributed Over Three Latent Topics}
   \label{fig:LDA}
 \end{figure}
@@ -177,7 +177,7 @@ The L1 regularized logistic regression (Logistic Lasso) is defined as:
 
 $$\underset{\rm \theta}{\rm min} \sum_{i=1}^M -\log p(y^{(i)}|x^{(i)}; \theta) + \beta ||\theta||$$
 
-L1 regularization has the effect of forcing feature selection, and as we observe the Logistic Lasso model performs best Tri-grams to 7-grams and performance significantly drops with larger Ngrams.  \vertSpace 
+L1 regularization has the effect of forcing feature selection, and as we observe the Logistic Lasso model performs best with Tri-grams to 7-grams while the F1 measure significantly drops with larger Ngrams.  \vertSpace 
 
 
 Below is the average accuracy of the four basic classifiers (Naive Bayes, SVM, Logistic Regression, and Logistic Lasso) after 10 iterations: 
@@ -211,7 +211,7 @@ Based on previous research that applied Naive Bayes to analyzing FOMC transcript
 As seen in the graphs above, the Logistic Lasso regression performs the best out of the four basic models.
 
 
- 
+\subsection{Neural Network} 
 % Bibliography
 %-----------------------------------------------------------------
 \begin{thebibliography}{99}
