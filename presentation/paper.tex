@@ -16,6 +16,7 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{float}
 \newcommand{\vertSpace}[1]{\vspace{3mm}}
 
 %-----------------------------------------------------------------
@@ -166,8 +167,45 @@ Given that the basic models are predicting binary classification we expected the
 
 Despite some good properties of SVM such as, SVM tend to perform better than logistic regression due to the face that SVMs are less sensitive to outliers and SVM try to maximize the margin between the closest support vectors while LR the posterior class probability. SVM generally find a solution which is as fare as possible for the two categories.  SVM provide prediction of 1 or 0, while the Logistic Regression provides a probability were a probability of 0.501 is enough for the prediction of FOMC rate action.  \vertSpace
 
+Below is the average accuracy of the four basic classifiers (Naive Bayes, SVM, Logistic Regression, and Logistic Lasso) after 10 iterations: 
 
-In addition, because this is a binary classification problem, we also exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression without any regularization.  \vertSpace 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lass_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_reg_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/NB_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_accuracy_more iterations".pdf}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Feature Choice}
+
+In our search for the optimal model, we tested different strategies for feature selection, namely different size Ngrams and document stacking (i.e., combining the minutes, statements, and speeches for a meeting into one document).  
+
+
+\subsubsection{Ngrams}
+
+For Ngrams, based on previous research analyzing FOMC transcripts \cite{stanford} with ML models, tri-grams and Naive Bayes performed the best for classifying the outcome of an FOMC meeting.  In line with that research, we found that N-grams of greater N generally resulted in greater accuracy and lower standard deviation.  \vertSpace
+
+
+We observed that the optimal number of Ngrams for Logistic Lasso, Logistic regression, and SVM was between three to seven Ngrams.  The performance of the three models based on F1 score started to drop significantly with Ngrams greater than seven.  However, we observed that performance (F1 score) for Naive Bayes increased with larger Ngrams.  Please refer to charts below for an illustration of the performance (F1 score) of the models with Ngrams between one and ten. 
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1".pdf}
+\end{center}
+\end{figure}
+
+
+
+We observed that the Logistic regression with L1 penalty (i.e. Logistic Lasso) performed the best for Ngrams between one and ten and we attribute this to the model being well suited for the binary classification problem.  We exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression without any regularization.  \vertSpace 
 
 Given that we are modelling a classification problem, we would expect the performance of the Logistic Lasso model based on the mathematical properties of Logistic Lasso more robust for predicting FOMC rate action.  Logistic regression models the probability distribution of the class label $y$ given a feature vector $x$: 
 
@@ -180,38 +218,41 @@ $$\underset{\rm \theta}{\rm min} \sum_{i=1}^M -\log p(y^{(i)}|x^{(i)}; \theta) +
 L1 regularization has the effect of forcing feature selection, and as we observe the Logistic Lasso model performs best with Tri-grams to 7-grams while the F1 measure significantly drops with larger Ngrams.  \vertSpace 
 
 
-Below is the average accuracy of the four basic classifiers (Naive Bayes, SVM, Logistic Regression, and Logistic Lasso) after 10 iterations: 
+\subsubsection{Stacked Documents}
 
-\begin{figure}[h!]
+In our research, we found that reducing the number of features through combining documents for each FOMC meeting into one and increasing Ngram size had a positive impact on accuracy for most of our models. \vertSpace
+
+
+We created and tested 'super features' through stacking documents and increasing Ngrams, and we observed steadily increasing F1 performance for most of our simple models (except Logistic Lasso) and the verious Neural Net models we created.  Below is a snapshot of the results: 
+
+
+\begin{figure}[H]
 \begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lass_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_reg_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/NB_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_accuracy_more iterations".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1_stacked".pdf}
 \end{center}
 \end{figure}
 
-
-\vspace{5cm}
-
-\subsection{Feature Choice}
-
-Based on previous research that applied Naive Bayes to analyzing FOMC transcripts \cite{stanford} ML models performed better with N-grams and performance peaked at tri-grams for Naive Bayes.  In our models, we found that N-grams of greater N saw greater accuracy and lower standard deviation.  
+\textbf{Neural Network}
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_20_10_5_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_40_40_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_40_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_f1_stacked".pdf}
+\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_80_f1_stacked".pdf}
 \end{center}
 \end{figure}
-
-As seen in the graphs above, the Logistic Lasso regression performs the best out of the four basic models.
 
 
 \subsection{Neural Network} 
+
+
+
 % Bibliography
 %-----------------------------------------------------------------
 \begin{thebibliography}{99}
