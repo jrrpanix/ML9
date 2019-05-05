@@ -1,0 +1,25 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsmath}
+\begin{document}
+\noindent
+{\setlength{\mathindent}{0cm}
+
+\noindent \textbf{FOMC Decison $D_t$ based on lagged document text}
+\begin{equation*}
+E[D_t | \mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k}]
+\end{equation*}
+
+
+\noindent \textbf{FOMC Decison $D_t$ based on aggregated lagged document text}
+\begin{equation*}
+E[D_t | \mbox{AGG}(\mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k})]
+\end{equation*}
+\noindent where 
+\begin{equation*}
+D_t = 1, \mbox{if change to rates}
+\end{equation*}
+\begin{equation*}
+D_t = 0, \mbox{if no chagne to rates}
+\end{equation*}
+\end{document}
