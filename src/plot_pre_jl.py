@@ -49,15 +49,17 @@ if __name__ == '__main__':
     parser.add_argument('--f1', nargs='+', help= "'svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'", 
                         default=['logistic_lasso', 'Naive_Bayes','svm'])
     args = parser.parse_args()
+    print(len(args.input))
+    print(args.input)
     assert len(args.input) == 2
     d0 = getdf(args.input[0])
     d1 = getdf(args.input[1])
     output = args.output
     
-    fig, axs=plt.subplots(2,1,figsize=(6,6)) 
+    fig, axs=plt.subplots(1,2,figsize=(20,5)) 
     fits0 = [f.replace("_B"," B") for f in args.f0]
     title0 = r'$E[D_t|Agg(St_{t-i}, Min_{t-j}, Sp_{t-k}),NGram]$'
-    compareFits(axs[0],d0, fits0, None, args.range, title0)
+    compareFits(axs[0],d0, fits0, None, args.range, title0, xaxis='NGram Length')
 
 
     fits1 = [f.replace("_B"," B") for f in args.f1]
