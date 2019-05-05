@@ -36,19 +36,20 @@
 \usepackage{natbib}
 \usepackage{lipsum}
 \usepackage[export]{adjustbox}
+\usepackage{subfig}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 \def\citeapos#1{\citeauthor{#1}'s (\citeyear{#1})}
 \renewcommand{\bibsection}{\subsubsection*{\bibname } }
 
-\title{Modelling Federal Open Market Committee Decisions Using ML and NLP}
+\title{Predicting FOMC Actions Using ML and NLP}
 
 %\subtitle{}
 
 % - Use the \inst{?} command only if the authors have different
 %   affiliation.
 %\author{F.~Author\inst{1} \and S.~Another\inst{2}}
-\author{Jeremy Lao \& John Reynolds} 
+\author{Jeremy Lao - jjl359  \& John Reynolds - jr4716} 
 
 % - Use the \inst command only if there are several affiliations.
 % - Keep it simple, no one is interested in your street address.
@@ -85,38 +86,39 @@ Courant Institute of Mathematical Sciences, NYU\\
 
 \begin{document}
 
-\begin{frame}
-\titlepage
-\end{frame}
 
 
 
 \begin{frame}
-Federal Open Market Committee (FOMC): Maximum Employment, Stable Inflation, Financial Stability
-\vspace{-3mm}
-\begin{figure}[H]
-\includegraphics[width=1\textwidth]{../output/data_for_graphs/Topic-Model-3-topics.PNG}
-\end{figure}
-\vspace{-5mm}
+\frametitle {Predicting FOMC Actions Using ML and NLP  \\Jeremy Lao - jjl359  \& John Reynolds - jr4716 }
 
-Ngrams (unigrams to 10-grams) - F1 Score
-\vspace{-1mm}
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=.25\textwidth]{"../output/data_for_graphs/log_lasso_f1".pdf}
-\includegraphics[width=.25\textwidth]{"../output/data_for_graphs/naive_bayes_f1".pdf}
-\end{center}
-\end{figure}
-\vspace{-5mm}
+\small \textbf{Model-1: FOMC Decison $D_t$ based on lagged document text}
+\vspace{-2mm}
+\begin{small}
+$$E[D_t | \mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k}, \mbox{N-gram}]$$
+\end{small}
+\vspace{-2.5mm}
+\small \textbf{Model-2: FOMC Decison $D_t$ based on aggregated lagged document text}
+\begin{small}
+$$E[D_t | \mbox{AGG}(\mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k}), \mbox{N-gram}]$$
+\end{small}
 
-Reduced Features (stacked documents, larger Ngrams) - F1 Score
-\vspace{-1mm}
-\begin{figure}[H]
-\includegraphics[width=.22\textwidth]{"../output/data_for_graphs/nn_40_40_f1_stacked".pdf}
-\includegraphics[width=.22\textwidth]{"../output/data_for_graphs/nn_40_f1_stacked".pdf}
-\includegraphics[width=.22\textwidth]{"../output/data_for_graphs/log_lasso_f1_stacked".pdf}
-\includegraphics[width=.22\textwidth]{"../output/data_for_graphs/naive_bayes_f1_stacked".pdf}
+\vspace{-7mm}
+
+\noindent \center {\small where} {$D_t = 1$}{\small, if change to rates,} {$D_t = 0$}{\small, if no change.}
+
+
+\vspace{-5mm}
+\begin{figure}[h]
+  \subfloat
+   {\includegraphics[width=.5\textwidth]{./model1.jpg}  
+   \hspace{10px}} 
+  \includegraphics[width=.5\textwidth]{./model2.jpg}
+  \captionsetup{labelformat=empty}
+  \caption{x-axis: Ngram, y-axis: F1 Score}
 \end{figure}
+
+
 
 \end{frame}
 
