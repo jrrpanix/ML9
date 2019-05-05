@@ -68,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
     parser.add_argument('--stack', action='store_true', default=False)
     parser.add_argument('--slow', action='store_true', default=False)
-    parser.add_argument('-o','--output', default='../text/data_for_graphs/model2_anagrams.csv')
+    parser.add_argument('-o','--output', default='../output/data_for_graphs/model2_anagrams.csv')
     args = parser.parse_args()
 
     clean_algo = complex_clean if args.cleanAlgo == "complex" else simple_clean
