@@ -220,10 +220,10 @@ L1 regularization has the effect of forcing feature selection, and as we observe
 
 \subsubsection{Stacked Documents}
 
-In our research, we found that reducing the number of features through combining documents for each FOMC meeting into one and increasing Ngram size had a positive impact on accuracy for most of our models. \vertSpace
+In our research, we found that reducing the number of features through combining documents for each FOMC meeting into one and increasing Ngram size had an impact on accuracy for most of our models. However, while it improved the performance of Naive Bayes, the net effect (as measured in F1 score) was lower precision and accuracy.  \vertSpace
 
 
-We created and tested 'super features' through stacking documents and increasing Ngrams, and we observed steadily increasing F1 performance for most of our simple models (except Logistic Lasso) and the verious Neural Net models we created.  Below is a snapshot of the results: 
+We created and tested 'super features' through stacking documents and increasing Ngrams, and we observed that F1 score steadily increased for all the simple models (except Logistic Lasso) and the verious Neural Net models we created.  Below is a snapshot of the results: 
 
 
 \begin{figure}[H]
@@ -234,6 +234,7 @@ We created and tested 'super features' through stacking documents and increasing
 \includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1_stacked".pdf}
 \end{center}
 \end{figure}
+
 
 \textbf{Neural Network}
 
