@@ -154,58 +154,31 @@ We utilized the following models in our research:
 
 
 
-\subsubsection{Basic Model Choice and Performance} 
+\subsubsection{Model Choice} 
 
-The basic models are Naive Bayes, Logistic Regression, Logistic Lasso, and SVM.  We tested for model accuracy through averaging various iterations of each model's results, and we empirically tested for the optimal number of bigrams and anagrams.  \vertSpace
+To identify the optimal prediction model we developed a simulator that would randomly create a training set and select a test set of meetings that temporally came after the training set: $$E[D_t | \mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k}, \mbox{N-gram}]$$  
 
+We tested for model accuracy through averaging various iterations of each model's results, we evaluated model performance with F1 scores (precision and recall), and we empirically tested for the optimal number of Ngrams for each model.  \vertSpace
 
-We found that the general accuracy of each model (for bigrams) peaked at around ten iterations of each model.  The F1 score, measured as the accuracy of predicting an FOMC move (up = down = 1) with bigrams, also peaks at around 10 iterations per model. \vertSpace
+Given our binary classification objective, we expected the Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform the best.  Based on empirical knowledge, FOMC rate moves are analyzed in terms of probabilities and the upcoming meeting is judged primarily on the outcome of Fed action or no action.  \vertSpace
 
-
-Given that the basic models are predicting binary classification we expected the Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform the best.  Based on empirical knowledge, FOMC rate moves are analyzed in terms of probabilities and the upcoming meeting is judged primarily on the outcome of Fed action or no action.  \vertSpace
-
-
-Despite some good properties of SVM such as, SVM tend to perform better than logistic regression due to the face that SVMs are less sensitive to outliers and SVM try to maximize the margin between the closest support vectors while LR the posterior class probability. SVM generally find a solution which is as fare as possible for the two categories.  SVM provide prediction of 1 or 0, while the Logistic Regression provides a probability were a probability of 0.501 is enough for the prediction of FOMC rate action.  \vertSpace
-
-Below is the average accuracy of the four basic classifiers (Naive Bayes, SVM, Logistic Regression, and Logistic Lasso) after 10 iterations: 
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lass_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_reg_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/NB_accuracy_more iterations".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_accuracy_more iterations".pdf}
-\end{center}
-\end{figure}
+Despite some good properties of SVM such as, SVM generally performs better than logistic regression due to the face that SVMs are less sensitive to outliers and SVM try to maximize the margin between the closest support vectors. However, becuase SVM provides prediction of 1 or 0 and Logistic Regression provides a probability, where a probability of 0.501 is enough for the prediction of FOMC rate action, Logistic Lasso most closely resembles how an interest rate expert would view FOMC action, a probabilistic approach.  \vertSpace
 
 
+\subsubsection{Feature Choice}
+
+In our search for the optimal model, we tested different strategies for feature selection, namely different size Ngrams and document stacking (i.e., combining the minutes, statements, and speeches for a meeting into one document):
+
+$$E[D_t | \mbox{AGG}(\mbox{Statements}_{t-i}, \mbox{Minutes}_{t-j} , \mbox{Speeches}_{t-k}), \mbox{N-gram}]$$
+
+Document stacking is a basic way to reduce the dimensionality of each meeting's documents, and we thought it would be an appropriate basic strategy to enhance model performance based on research from [footnote]. \vertSpace 
+
+For Ngrams, based on previous research analyzing FOMC transcripts \cite{stanford} with ML models, tri-grams wiht a Naive Bayes model performed the best for classifying the outcome of an FOMC meeting.  In line with that research, we found that N-grams of greater N generally resulted in greater accuracy and lower standard deviation.  \vertSpace
 
 
-\subsection{Feature Choice}
+\subsection{Model Performance and Results}
 
-In our search for the optimal model, we tested different strategies for feature selection, namely different size Ngrams and document stacking (i.e., combining the minutes, statements, and speeches for a meeting into one document).  
-
-
-\subsubsection{Ngrams}
-
-For Ngrams, based on previous research analyzing FOMC transcripts \cite{stanford} with ML models, tri-grams and Naive Bayes performed the best for classifying the outcome of an FOMC meeting.  In line with that research, we found that N-grams of greater N generally resulted in greater accuracy and lower standard deviation.  \vertSpace
-
-
-We observed that the optimal number of Ngrams for Logistic Lasso, Logistic regression, and SVM was between three to seven Ngrams.  The performance of the three models based on F1 score started to drop significantly with Ngrams greater than seven.  However, we observed that performance (F1 score) for Naive Bayes increased with larger Ngrams.  Please refer to charts below for an illustration of the performance (F1 score) of the models with Ngrams between one and ten. 
-
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1".pdf}
-\end{center}
-\end{figure}
-
-
-
-We observed that the Logistic regression with L1 penalty (i.e. Logistic Lasso) performed the best for Ngrams between one and ten and we attribute this to the model being well suited for the binary classification problem.  We exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression without any regularization.  \vertSpace 
+Based on our simulation we observed that the Logistic regression with L1 penalty (i.e. Logistic Lasso) performed the best for Ngrams between two and ten and we attribute this to the model being well suited for the binary classification problem.  We exptected Logistic Regression with L1 penalty (i.e., Logistic Lasso) to perform better than Logistic Regression without any regularization.  \vertSpace 
 
 Given that we are modelling a classification problem, we would expect the performance of the Logistic Lasso model based on the mathematical properties of Logistic Lasso more robust for predicting FOMC rate action.  Logistic regression models the probability distribution of the class label $y$ given a feature vector $x$: 
 
@@ -218,40 +191,17 @@ $$\underset{\rm \theta}{\rm min} \sum_{i=1}^M -\log p(y^{(i)}|x^{(i)}; \theta) +
 L1 regularization has the effect of forcing feature selection, and as we observe the Logistic Lasso model performs best with Tri-grams to 7-grams while the F1 measure significantly drops with larger Ngrams.  \vertSpace 
 
 
-\subsubsection{Stacked Documents}
-
-In our research, we found that reducing the number of features through combining documents for each FOMC meeting into one and increasing Ngram size had an impact on accuracy for most of our models.   \vertSpace
-
-
-We created and tested 'super features' through stacking documents and increasing Ngrams, and we observed that F1 score steadily increased for all the simple models (except Logistic Lasso) and the verious Neural Net models we created.  Below is a snapshot of the results: 
-
+Below is a picutre of model performance which shows that the Logistic Lasso has the highest F1 $(>90\%)$
 
 \begin{figure}[H]
-\begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_lasso_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/log_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/naive_bayes_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/SVM_f1_stacked".pdf}
-\end{center}
+\includegraphics[width=1\textwidth]{"side-by-side".pdf}
 \end{figure}
 
 
-\textbf{Neural Network}
+\subsection{Conclusion}
 
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_20_10_5_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_40_40_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_40_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_40_f1_stacked".pdf}
-\includegraphics[width=.3\textwidth]{"../output/data_for_graphs/nn_80_f1_stacked".pdf}
-\end{center}
-\end{figure}
-
-
-\subsection{Neural Network} 
-
+We found that the model results and methodology for simulating training and test data for model and feature selection to be robust.  Our next recommendation is to utilize this in the production environment and evaluate whether there are trading opportunities when predicting the probability of a move versus the market implied probability from Fed Funds futures.  
 
 
 % Bibliography
