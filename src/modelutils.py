@@ -165,8 +165,11 @@ class modelutils:
         combined = pd.concat(data_sets) if type(data_sets) is list else data_sets
         return train_test_split(combined, test_size=1.0-train_pct)
 
-    def getFeatures(train_data, test_data, ngram):
-        vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
+    def getFeatures(train_data, test_data, ngram, Tfid=False):
+        if Tfid :
+            vectorizer = TfidVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
+        else:
+            vectorizer = CountVectorizer(stop_words="english",preprocessor=None, ngram_range=ngram)
         training_features = vectorizer.fit_transform(train_data["DocText"])                                 
         test_features = vectorizer.transform(test_data["DocText"])
         return training_features, test_features

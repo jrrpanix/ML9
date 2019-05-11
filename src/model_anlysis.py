@@ -32,7 +32,7 @@ import scipy
 # python ./model2_0.py --ngram 1,1 2,2 3,3 1,3 2,3 --Niter 3 --pctTrain .8 --data minutes speeches statements
 
 
-def runModels(models, model_data_set, Nitr, pctTrain, ngram):
+def runModels(models, model_data_set, Nitr, pctTrain, ngram, tfid):
     results, prec,recall,f1, trainPos, testPos=[],[],[],[], np.zeros(Nitr), np.zeros(Nitr)
     for iter in range(Nitr):
         train_data, test_data = modelutils.splitTrainTest(model_data_set, pctTrain)
@@ -78,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', nargs="+", default=["minutes", "speeches", "statements"])
     parser.add_argument('--stack', action='store_true', default=False)
     parser.add_argument('--slow', action='store_true', default=False)
+    parser.add_argument('--tfid',action='store_true', default=False)
     parser.add_argument('-o','--output', default='../output/data_for_graphs/model2_anagrams.csv')
     args = parser.parse_args()
 
@@ -127,6 +128,9 @@ if __name__ == '__main__':
     else:
         stack="Flase"
 
+    tfid= args.tfid
+    tfidstr= "False" if tfid == False else "True"
+
     
 
     # Train on current minutes
@@ -159,19 +163,19 @@ if __name__ == '__main__':
 
 
     print("Determining Fed Action from minutes")
-    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s %6s %6s %6s %5s %10s %8s %8s %8s %10s %6s" % 
-          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack", "NF", "Norm", "Ratio", "Sparcity", "Size", "NZ"))
+    print("%-20s %5s %5s %10s %10s %5s %8s %7s %10s %10s %-27s %6s %6s %6s %6s %6s %5s %5s %10s %8s %8s %8s %10s %6s" % 
+          ("Model Name", "NGram", "Niter", "mean(acc)", "std(acc)","N","PctTrain", "clean", "start", "end", "Data Sets", "TrainP", "TestP", "Prec", "Recall", "F1", "Stack", "Tfid","NF", "Norm", "Ratio", "Sparcity", "Size", "NZ"))
 
     outputDF = []
 
     for ngram in ngrams:
-        results, trainPos, testPos, prec, recall, f1, NF, norm, nz, sz = runModels(models, data_set, Niter, pctTrain, ngram)
+        results, trainPos, testPos, prec, recall, f1, NF, norm, nz, sz = runModels(models, data_set, Niter, pctTrain, ngram, tfid)
         sparcityScore = nz/sz
         ngramstr = str(ngram[0]) + ":" + str(ngram[1])
         for m, r, t, u, v in zip(models, results, prec, recall, f1):
             name, mu, s, precMu, recallMu, f1Mu , normR = m[0], np.mean(r), np.std(r), np.mean(t), np.mean(u), np.mean(v), norm/NF
-            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f %6.3f %6.3f %6.3f %5s %10.0f %8.0f %8.6f %8.6f %10.0f %6.0f " % 
-                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), precMu, recallMu, f1Mu, stack, NF, norm, normR, sparcityScore, sz, nz))
+            print("%-20s %5s %5s %10.4f %10.4f %5d %8.3f %7s %10s %10s %-27s %6.3f %6.3f %6.3f %6.3f %6.3f %5s %5s %10.0f %8.0f %8.6f %8.6f %10.0f %6.0f " % 
+                  (name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), precMu, recallMu, f1Mu, stack, tfidstr, NF, norm, normR, sparcityScore, sz, nz))
 
             outputDF.append([name, ngramstr, Niter, mu, s, N, pctTrain, cleanA, start, end, datasetlabel, np.mean(trainPos), np.mean(testPos), precMu, recallMu, f1Mu, stack])
         print("")
