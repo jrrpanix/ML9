@@ -91,6 +91,8 @@ if __name__ == '__main__':
     pctTrain, cleanA, Niter, ngram = args.pctTrain, args.cleanAlgo, args.Niter, args.ngram
     solver, max_iter, datasetlist = args.solver, args.max_iter, args.data
 
+    assert os.path.isdir(os.path.dirname(args.output))
+
     if len(ngram[0].split(':')) > 1 :
         ngram = ngram[0]
         lb , ub = int(ngram.split(':')[0]), int(ngram.split(':')[1])
