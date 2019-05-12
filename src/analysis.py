@@ -63,10 +63,17 @@ def ParameterImpact(d1):
         f1Max[i] = c[4]
     return model, param, f1Mean, f1Min, f1Max
 
+
+def showOrSave(output=None):
+    if output is not None:
+        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
+    else:
+        plt.show()
+    
 #
 # Plot impact of regularization parameter on predicted F1 Score
 #    
-def PlotL1(f1, output=None):
+def PlotL1(f1, output=None, showMinMax=False):
     d1 = pd.read_csv(f1)
     dns = d1[d1["Stack"] == False]
     modelns, xns, yns, yns_min, yns_max = ParameterImpact(dns)
@@ -79,17 +86,16 @@ def PlotL1(f1, output=None):
     plt.ylabel('F1 Score')
 
     plt.plot(xns[1:],yns[1:], marker='o', label='unstacked-mean F1 score')
-    #plt.plot(xns[1:],yns_max[1:], marker='o', label='unstacked-max')
-    #plt.plot(xns[1:],yns_min[1:], marker='o', label='unstacked-min')
-
     plt.plot(xs[1:],ys[1:], marker='o', label='stacked-mean F1 score')
-    #plt.plot(xs[1:],ys_min[1:], marker='o', label='stacked-min')
-    #plt.plot(xs[1:],ys_max[1:], marker='o', label='stacked-max')
+
+    if showMinMax :
+        plt.plot(xns[1:],yns_max[1:], marker='o', label='unstacked-max F1')
+        plt.plot(xns[1:],yns_min[1:], marker='o', label='unstacked-min F1')
+        plt.plot(xs[1:],ys_min[1:], marker='o', label='stacked-min F1')
+        plt.plot(xs[1:],ys_max[1:], marker='o', label='stacked-max F1')
+
     plt.legend()
-    if output is not None:
-        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
-    else:
-        plt.show()
+    showOrSave(output)
 
 #
 # Plot the Number of Elements in the Matricies for different NGrams with
@@ -119,10 +125,7 @@ def matrixSize(f1, output=None):
     plt.xlabel("ngrams")
     plt.ylabel("matrix elements (billions)")
     plt.legend()
-    if output is not None:
-        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
-    else:
-        plt.show()
+    showOrSave(output)
 
 def sparse(f1, output=None):
     d1 = pd.read_csv(f1)
@@ -144,10 +147,7 @@ def sparse(f1, output=None):
     plt.title('Number of Features and Matrix Sparcity')
     plt.xlabel('Number of Features (Millions)')
     plt.ylabel('Matrix Sparcity')
-    if output is not None:
-        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
-    else:
-        plt.show()
+    showOrSave(output)
 
 def naiveBayesSmoothing(f1, output=None):
     d1 = pd.read_csv(f1)
@@ -161,10 +161,62 @@ def naiveBayesSmoothing(f1, output=None):
     plt.ylabel('F1 score')
     plt.title('Naive Bayes Smothing Parameter')
     plt.legend()
-    if output is not None:
-        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
-    else:
-        plt.show()
+    showOrSave(output)
+
+def performanceMatrixSize(f1, output=None, f2=None, limit=0.01):
+    limit = 0.01 if limit is None else limit
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    #d1 = d1[d1["Stack"] == False]
+    show=["MultiNB0.0", "Logistic", "Logistic Lasso5.0"]
+    models = d1["Model Name"].unique()
+    for model in models :
+        if not model in show: continue
+        dm = d1[d1["Model Name"] == model]
+        f1, sz = dm.F1.values, dm.sz.values/1e9
+        combo = sorted([(sz[i], f1[i]) for i in range(len(f1))], key = lambda x : x[0])
+        x = [c[0] for c in combo if c[0] > limit]
+        y = [c[1] for c in combo if c[0] > limit]
+        plt.plot(x,y, marker='o', label=model)
+    plt.legend()
+    plt.title("Matrix Size vs F1")
+    plt.xlabel("Matrix Size Billions")
+    plt.ylabel("F1 Score")
+    showOrSave(output)
+
+def performanceSparsity(f1, output=None, f2=None, limit=1.0):
+    limit = 1.00 if limit is None else limit
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    #d1 = d1[d1["Stack"] == False]
+    show=["MultiNB0.0", "Logistic", "Logistic Lasso5.0"]
+    models = d1["Model Name"].unique()
+    for model in models :
+        if not model in show: continue
+        dm = d1[d1["Model Name"] == model]
+        f1, sz = dm.F1.values, dm.sparcity.values
+        combo = sorted([(sz[i], f1[i]) for i in range(len(f1))], key = lambda x : x[0])
+        x = [c[0] for c in combo if c[0] < limit]
+        y = [c[1] for c in combo if c[0] < limit]
+        plt.plot(x,y, marker='o', label=model)
+    plt.legend()
+    plt.title("Matrix Sparsity vs F1")
+    plt.xlabel("Matrix Sparsity")
+    plt.ylabel("F1 Score")
+    showOrSave(output)
+
+
+def modelRanking(f1, output=None):
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d2= d2[d2["Tfid"] == True]
+        d1 = d1.append(d2)
+    
 
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
@@ -182,11 +234,17 @@ if __name__ == '__main__':
     # to get graph of impact of Smoothing Parmeter on Naive Bayes Models 
     # python analysis.py -i ../analysis/naive.csv  -r smooth
 
+    # Size vs F1
+    #python analysis.py -i ../analysis/all_lasso.csv ../analysis/naive.csv -r psize -l 1.1 -o SizeVF1
+
+    # Sparsity vs F1
+    #python analysis.py -i ../analysis/all_lasso.csv ../analysis/naive.csv -r psparse -l 0.0025 -o SparsityVF1
 
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', nargs='+', default=None)
     parser.add_argument('-o','--output', default=None)
-    parser.add_argument('-r','--run', help='l1 , size, sparse, smooth', default='l1')
+    parser.add_argument('-l','--limit', default=None, type=float)
+    parser.add_argument('-r','--run', help='l1 , size, sparse, smooth, psize, psparse', default='l1')
     args = parser.parse_args()
 
     f1 = args.input[0]
@@ -200,3 +258,7 @@ if __name__ == '__main__':
         sparse(f1, args.output)
     elif args.run == 'smooth':
         naiveBayesSmoothing(f1, args.output)
+    elif args.run == 'psize':
+        performanceMatrixSize(f1, args.output, f2, args.limit)
+    elif args.run == 'psparse':
+        performanceSparsity(f1, args.output, f2, args.limit)
