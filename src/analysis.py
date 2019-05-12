@@ -109,6 +109,31 @@ def matrixSize(f1, output=None):
     else:
         plt.show()
 
+def sparse(f1, output=None):
+    d1 = pd.read_csv(f1)
+    ds = d1[d1["Stack"] == True]
+    nfs = ds["NF"].values/1e6
+    svs = ds["sparcity"].values
+    f1s = ds["F1"].values
+    #plt.scatter(sv, f1)
+    plt.scatter(nfs, svs, marker='o', label='stacked')
+
+    dns = d1[d1["Stack"] == False]
+    dns = dns[dns["NGram"] != "1:1"]
+    nfns = dns["NF"].values/1e6
+    svns = dns["sparcity"].values
+    f1ns = dns["F1"].values
+    mx = dns["sparcity"].max()
+    plt.scatter(nfns, svns, marker='x', label='unstacked')
+    plt.legend()
+    plt.title('Number of Features and Matrix Sparcity')
+    plt.xlabel('Number of Features (Millions)')
+    plt.ylabel('Matrix Sparcity')
+    if output is not None:
+        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
+    else:
+        plt.show()
+
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
     # python ./analysis.py -i ../analysis/all_lasso.csv -r size -o [to save to file]
@@ -121,7 +146,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', default=None)
     parser.add_argument('-o','--output', default=None)
-    parser.add_argument('-r','--run', help='l1 , size', default='l1')
+    parser.add_argument('-r','--run', help='l1 , size, sparse', default='l1')
     args = parser.parse_args()
 
     if args.run == 'l1':
@@ -129,4 +154,6 @@ if __name__ == '__main__':
         PlotL1(args.input, args.output)
     elif args.run == 'size':
         matrixSize(args.input, args.output)
+    elif args.run == 'sparse':
+        sparse(args.input, args.output)
 
