@@ -30,13 +30,16 @@ def fixf1(f1, f2, fname="./all_lasso.csv"):
 # for the different regularization parameters, get
 # the mean F1 values and regularization strength
 #
-def L1_Impact(d1):
+def ParameterImpact(d1):
     # For all of the runs
-    # Group By Model Name - ModelName = Logistic Lasso + <Regularization Parameter>
-    # Note sklearn regularization parameter is 'C', higher C is less regularization
-    # We are graphing based on traditional alpha parameter which is saved in file as 1/C
-    # Get the Mean F1 score for each model
-    # Get L1 Regularization Impact 
+    # Group By Model Name - ModelName 
+
+    # Logistic Lasso + <Regularization Parameter>
+    # For Logistic Lasso the Inverse Regularization Parameter is 'C' in sklearn
+    
+    # Naive Bayes model names are MultiNB+<smoothing parameter>
+    # For Naive Bayse the Laplace Smoothing Parameter is alpha in sklearn
+
     g=d1.groupby(['Model Name']).agg({
             'Model Name': [lambda x : ' '.join(x)],
             'C' :['mean'],
@@ -66,20 +69,20 @@ def L1_Impact(d1):
 def PlotL1(f1, output=None):
     d1 = pd.read_csv(f1)
     dns = d1[d1["Stack"] == False]
-    modelns, xns, yns, yns_min, yns_max = L1_Impact(dns)
+    modelns, xns, yns, yns_min, yns_max = ParameterImpact(dns)
 
     ds = d1[d1["Stack"] == True]
-    models, xs, ys, ys_min, ys_max = L1_Impact(ds)
+    models, xs, ys, ys_min, ys_max = ParameterImpact(ds)
     
     plt.title('Logistic Lasso Regularization')
     plt.xlabel('L1 Regularization(larger more regularization)')
     plt.ylabel('F1 Score')
 
-    plt.plot(xns[1:],yns[1:], marker='o', label='unstacked-mean')
+    plt.plot(xns[1:],yns[1:], marker='o', label='unstacked-mean F1 score')
     #plt.plot(xns[1:],yns_max[1:], marker='o', label='unstacked-max')
     #plt.plot(xns[1:],yns_min[1:], marker='o', label='unstacked-min')
 
-    plt.plot(xs[1:],ys[1:], marker='o', label='stacked-mean')
+    plt.plot(xs[1:],ys[1:], marker='o', label='stacked-mean F1 score')
     #plt.plot(xs[1:],ys_min[1:], marker='o', label='stacked-min')
     #plt.plot(xs[1:],ys_max[1:], marker='o', label='stacked-max')
     plt.legend()
@@ -150,7 +153,7 @@ def naiveBayesSmoothing(f1, output=None):
     d1 = pd.read_csv(f1)
     spliton="MultiNB"
     d1["C"] = [float(s.split(spliton)[-1]) if len(s.split(spliton)) > 1 else 0 for s in d1["Model Name"].values]
-    model, x, y, ymin, ymax= L1_Impact(d1)
+    model, x, y, ymin, ymax= ParameterImpact(d1)
     plt.plot(x,y, marker='o', label='mean f1')
     plt.plot(x,ymax, marker='o', label='max f1')
     plt.plot(x,ymin, marker='o', label='min f1')
