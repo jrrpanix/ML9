@@ -40,18 +40,25 @@ def L1_Impact(d1):
     g=d1.groupby(['Model Name']).agg({
             'Model Name': [lambda x : ' '.join(x)],
             'C' :['mean'],
-            'F1':['mean']})
-    mn = g['Model Name']['<lambda>'].values
-    gv = g['F1']['mean'].values
-    cv = g['C']['mean'].values
-    mn =[s.split(" ")[-1] for s in mn]
-    combo=sorted([(m,vx,ci) for m,vx,ci in zip(mn, gv, cv)], key=lambda x : x[2], reverse=False)
-    reg = np.zeros(len(combo))
-    f1 = np.zeros(len(combo))
-    for i,c in enumerate(combo):
-        reg[i] = c[2]
-        f1[i] = c[1]
-    return reg, f1
+            'F1':['mean','min','max']})
+    nameV = g['Model Name']['<lambda>'].values
+    f1MeanV = g['F1']['mean'].values
+    f1MinV = g['F1']['min'].values
+    f1MaxV = g['F1']['max'].values
+    CV = g['C']['mean'].values
+    namveV =[s.split(" ")[-1] for s in nameV]
+    combo=sorted([(name, ci, f1mean, f1min, f1max, ci) for name, ci, f1mean, f1min, f1max in zip(nameV, CV, f1MeanV, f1MinV, f1MaxV)], 
+                 key=lambda x : x[1], reverse=False)
+    N = len(combo)
+    model = [None]* N
+    param, f1Mean, f1Min, f1Max = np.zeros(N), np.zeros(N), np.zeros(N), np.zeros(N) # 
+    for i, c in enumerate(combo):
+        model = c[0]
+        param[i] = c[1]
+        f1Mean[i] = c[2]
+        f1Min[i] = c[3]
+        f1Max[i] = c[4]
+    return model, param, f1Mean, f1Min, f1Max
 
 #
 # Plot impact of regularization parameter on predicted F1 Score
@@ -59,17 +66,22 @@ def L1_Impact(d1):
 def PlotL1(f1, output=None):
     d1 = pd.read_csv(f1)
     dns = d1[d1["Stack"] == False]
-    xns, yns = L1_Impact(dns)
+    modelns, xns, yns, yns_min, yns_max = L1_Impact(dns)
 
     ds = d1[d1["Stack"] == True]
-    xs, ys = L1_Impact(ds)
+    models, xs, ys, ys_min, ys_max = L1_Impact(ds)
     
     plt.title('Logistic Lasso Regularization')
     plt.xlabel('L1 Regularization(larger more regularization)')
     plt.ylabel('F1 Score')
 
-    plt.plot(xns[1:],yns[1:], marker='o', label='unstacked')
-    plt.plot(xs[1:],ys[1:], marker='o', label='stacked')
+    plt.plot(xns[1:],yns[1:], marker='o', label='unstacked-mean')
+    #plt.plot(xns[1:],yns_max[1:], marker='o', label='unstacked-max')
+    #plt.plot(xns[1:],yns_min[1:], marker='o', label='unstacked-min')
+
+    plt.plot(xs[1:],ys[1:], marker='o', label='stacked-mean')
+    #plt.plot(xs[1:],ys_min[1:], marker='o', label='stacked-min')
+    #plt.plot(xs[1:],ys_max[1:], marker='o', label='stacked-max')
     plt.legend()
     if output is not None:
         plt.savefig("{}.pdf".format(output), bbox_inches='tight')
@@ -134,6 +146,23 @@ def sparse(f1, output=None):
     else:
         plt.show()
 
+def naiveBayesSmoothing(f1, output=None):
+    d1 = pd.read_csv(f1)
+    spliton="MultiNB"
+    d1["C"] = [float(s.split(spliton)[-1]) if len(s.split(spliton)) > 1 else 0 for s in d1["Model Name"].values]
+    model, x, y, ymin, ymax= L1_Impact(d1)
+    plt.plot(x,y, marker='o', label='mean f1')
+    plt.plot(x,ymax, marker='o', label='max f1')
+    plt.plot(x,ymin, marker='o', label='min f1')
+    plt.xlabel('Laplace Smoothing Parameter')
+    plt.ylabel('F1 score')
+    plt.title('Naive Bayes Smothing Parameter')
+    plt.legend()
+    if output is not None:
+        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
+    else:
+        plt.show()
+
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
     # python ./analysis.py -i ../analysis/all_lasso.csv -r size -o [to save to file]
@@ -143,17 +172,28 @@ if __name__ == '__main__':
     # python ./analysis.py -i ../analysis/all_lasso.csv -r size
     #
 
+    # to get graph of features vs sparsity
+    # python ./analysis.py -i ../analysis/all_lasso.csv -r sparse
+    #
+
+    # to get graph of impact of Smoothing Parmeter on Naive Bayes Models 
+    # python analysis.py -i ../analysis/naive.csv  -r smooth
+
+
     parser = argparse.ArgumentParser(description='ML Spring 2019')
-    parser.add_argument('-i','--input', default=None)
+    parser.add_argument('-i','--input', nargs='+', default=None)
     parser.add_argument('-o','--output', default=None)
-    parser.add_argument('-r','--run', help='l1 , size, sparse', default='l1')
+    parser.add_argument('-r','--run', help='l1 , size, sparse, smooth', default='l1')
     args = parser.parse_args()
 
-    if args.run == 'l1':
-        # ../analysis/all_lasso.csv
-        PlotL1(args.input, args.output)
-    elif args.run == 'size':
-        matrixSize(args.input, args.output)
-    elif args.run == 'sparse':
-        sparse(args.input, args.output)
+    f1 = args.input[0]
+    f2 = args.input[1] if len(args.input) >1 else None
 
+    if args.run == 'l1':
+        PlotL1(f1, args.output)
+    elif args.run == 'size':
+        matrixSize(f1, args.output)
+    elif args.run == 'sparse':
+        sparse(f1, args.output)
+    elif args.run == 'smooth':
+        naiveBayesSmoothing(f1, args.output)
