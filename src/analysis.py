@@ -65,11 +65,11 @@ def PlotL1(f1, output=None):
     xs, ys = L1_Impact(ds)
     
     plt.title('Logistic Lasso Regularization')
-    plt.xlabel('L1 Regularization, larger more regularization')
+    plt.xlabel('L1 Regularization(larger more regularization)')
     plt.ylabel('F1 Score')
 
-    plt.plot(xns[1:],yns[1:], marker='o', label='more sparsity')
-    plt.plot(xs[1:],ys[1:], marker='o', label='less sparsity')
+    plt.plot(xns[1:],yns[1:], marker='o', label='unstacked')
+    plt.plot(xs[1:],ys[1:], marker='o', label='stacked')
     plt.legend()
     if output is not None:
         plt.savefig("{}.pdf".format(output), bbox_inches='tight')
