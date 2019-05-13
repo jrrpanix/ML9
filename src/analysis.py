@@ -210,13 +210,34 @@ def performanceSparsity(f1, output=None, f2=None, limit=1.0):
     showOrSave(output)
 
 
-def modelRanking(f1, output=None):
+def modelRanking(f1, output=None, f2=None):
     d1 = pd.read_csv(f1)
     if f2 is not None:
         d2 = pd.read_csv(f2)
-        d2= d2[d2["Tfid"] == True]
         d1 = d1.append(d2)
-    
+    ngram = d1["NGram"].unique()
+    combo = []
+    exclude = ["6:6", "8:8", "10:10", "12:12", "20:20", "4:6", "10:15", "15:15"]
+    for n in ngram:
+        if n in exclude: continue
+        dn = d1[d1["NGram"] == n]
+        ds = dn[dn["Stack"] == True]
+        dns = dn[dn["Stack"] == False]
+        combo.append((n, dns.F1.max(), ds.F1.max()))
+    combo = sorted(combo, key = lambda x : max(x[1],x[2]))
+    label = [c[0] for c in combo]
+    vns    = [c[1] for c in combo]
+    vs   = [c[2] for c in combo]
+    width = 0.15
+    ind = np.arange(len(label)) 
+    plt.bar(ind-width/2, vs, width, label="F1-stacked")
+    plt.bar(ind+width/2, vns, width, label="F1-not-stacked")
+    plt.xticks(ind-width, label)
+    plt.xlabel("NGram")
+    plt.ylabel("F1 Score")
+    plt.title("NGram Model Performance")
+    plt.legend()
+    showOrSave(output)
 
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
@@ -261,4 +282,6 @@ if __name__ == '__main__':
     elif args.run == 'psize':
         performanceMatrixSize(f1, args.output, f2, args.limit)
     elif args.run == 'psparse':
-        performanceSparsity(f1, args.output, f2, args.limit)
+        performanceSparsity(f1, args.output, f2, args.limit) 
+    elif args.run == 'rank':
+        modelRanking(f1, args.output, f2)
