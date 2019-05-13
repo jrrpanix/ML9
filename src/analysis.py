@@ -261,6 +261,9 @@ if __name__ == '__main__':
     # Sparsity vs F1
     #python analysis.py -i ../analysis/all_lasso.csv ../analysis/naive.csv -r psparse -l 0.0025 -o SparsityVF1
 
+    # Model Ranking
+    #python analysis.py -i ../analysis/all_lasso.csv ../analysis/naive.csv -r rank -o ModelRanking
+
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', nargs='+', default=None)
     parser.add_argument('-o','--output', default=None)
