@@ -152,6 +152,19 @@ A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
 \end{equation*}
 \end{itemize}
 
+\subsubsection{Training, Testing and Determining the efficacy of the Models}
+For this study we randomly sample 75$\%$ of the corpus for training and then 
+predict Fed action using the ramining 25$\%$ of the data and calculate
+\begin{itemize}
+\item Accuracy
+\item Precision
+\item Recall
+\item F1 Score
+\end{itemize}
+Approximately 70$\%$ of the time there is no Action so a model that does nothing will
+have an accuracy of 70$\%$, but a recall of 0.  The results are summarized using F1
+score.
+
 \subsubsection{The impact of regularization coefficient $\alpha$ on logistic regression}
 \noindent 
 For \textbf{Logistic Lasso} we are interested in examining the impact of the regularization parameter $\alpha$ on
