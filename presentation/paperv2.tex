@@ -141,7 +141,6 @@ For this problem the large feature size relative to the the number of labels dic
 at Bayesian approach or some from of L1 regularization (HW1 problem 2) to push a large number
 of coefficients to zero.
 \begin{itemize}
-
 \item Naive Bayes
 \begin{equation*}
 P(A|x_1,x_2,...,x_n) = p(A)\prod_{i=1}^n p(x_i|A)
@@ -151,8 +150,42 @@ P(A|x_1,x_2,...,x_n) = p(A)\prod_{i=1}^n p(x_i|A)
 \begin{equation*}
 A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
 \end{equation*}
-
 \end{itemize}
+
+\noindent 
+For \textbf{Logistic Lasso} we are interested in examining the impact of the regularization parameter on
+the fraction of  non-zero coefficients remaining after regularization is applied and on the impact of the predictive
+score on test data. \\
+
+\noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
+ \hline
+ \multicolumn{6}{|c|}{Comparision of Logistic Lasso with different regularization} \\
+ \hline
+ \multicolumn{1}{|c|}{} &
+ \multicolumn{1}{|c|}{} &
+ \multicolumn{2}{|c|}{Unstacked} &
+ \multicolumn{2}{|c|}{Stacked}\\
+ \hline
+ N-gram & $\alpha$ & F1 & frac remain & F1 & frac remain\\
+ \hline
+
+10:15 &  3.333 & 0.454 & 0.000040 & 0.720 & 0.000016 \\
+10:15 &  2.000 & 0.575 & 0.000066 & 0.897 & 0.000029 \\
+10:15 &  1.000 & 0.647 & 0.000148 & 0.893 & 0.000055 \\
+10:15 &  0.500 & 0.679 & 0.000291 & 0.913 & 0.000094 \\
+10:15 &  0.200 & 0.708 & 0.000339 & 0.913 & 0.000134 \\
+10:15 &  0.100 & 0.710 & 0.000463 & 0.923 & 0.000161 \\
+10:15 &  0.050 & 0.711 & 0.000619 & 0.925 & 0.000206 \\
+10:15 &  0.020 & 0.715 & 0.000764 & 0.923 & 0.000243 \\
+10:15 &  0.010 & 0.713 & 0.001045 & 0.913 & 0.000315 \\
+10:15 &  0.002 & 0.730 & 0.001659 & 0.906 & 0.000517 \\
+10:15 &  0.000 & 0.669 & 0.978049 & 0.669 & 1.000000 \\
+ \hline
+\end{tabular}
+
+
+
+
 
 \section{Conclusion}
 Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.
