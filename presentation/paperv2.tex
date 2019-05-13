@@ -108,7 +108,7 @@ E[D_{ti}] = f(ngram(n_1, n_2)[\mbox{Document}_{j1,ti-k1},{Document}_{j2,ti-k2},.
 \subsection{Matrix Sizes and Sparsity from CountVector}
 
 \noindent For this study we used \textbf{CountVectorizer} (\textbf{TfiDf} can also be used, but it did not alter the conclustions of this study).
-When are n-gram is applied to corpus it combinatorics diticates a large number of features will be generated and for a given feature, most of the column entries will
+When an n-gram is applied to corpus combinatorics diticates a large number of features will be generated and for a given feature, most of the column entries will
 be zero, resulting in extremly sparse matricies.  The table below gives a measure of $\mbox{sparsity} = \frac{non-zero elements}{total elements}$ and 
 the resulting number of elements in each n-gram generated matrix in the billions. In general stacking reduces the sparsity by a factor of 4 and
 the matrix size by a factor of 5. The L1 matrix norm for all of the matricies ranged between 1200 to 1600.\\
@@ -136,7 +136,23 @@ the matrix size by a factor of 5. The L1 matrix norm for all of the matricies ra
 \end{tabular}
 
 \subsection{Apply ML to Sparse Matricies generated from CountVectorizer}
-<TODO>
+\noindent
+For this problem the large feature size relative to the the number of labels dicitates looking
+at Bayesian approach or some from of L1 regularization (HW1 problem 2) to push a large number
+of coefficients to zero.
+\begin{itemize}
+
+\item Naive Bayes
+\begin{equation*}
+P(A|x_1,x_2,...,x_n) = p(A)\prod_{i=1}^n p(x_i|A)
+\end{equation*}
+
+\item Logistic Lasso
+\begin{equation*}
+A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
+\end{equation*}
+
+\end{itemize}
 
 \section{Conclusion}
 Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.
