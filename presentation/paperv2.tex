@@ -106,11 +106,12 @@ E[D_{ti}] = f(ngram(n_1, n_2)[\mbox{Document}_{j1,ti-k1},{Document}_{j2,ti-k2},.
 \end{equation*}
 
 \subsection{Matrix Sizes and Sparsity from CountVector}
-\noindent For this study we used \textbf{CountVector} (\textbf{TfiDf} can also be used, but it did not alter the conclustions of this study).
+
+\noindent For this study we used \textbf{CountVectorizer} (\textbf{TfiDf} can also be used, but it did not alter the conclustions of this study).
 When are n-gram is applied to corpus it combinatorics diticates a large number of features will be generated and for a given feature, most of the column entries will
 be zero, resulting in extremly sparse matricies.  The table below gives a measure of $\mbox{sparsity} = \frac{non-zero elements}{total elements}$ and 
 the resulting number of elements in each n-gram generated matrix in the billions. In general stacking reduces the sparsity by a factor of 4 and
-the matrix size by a factor of 5.\\
+the matrix size by a factor of 5. The L1 matrix norm for all of the matricies ranged between 1200 to 1600.\\
 
 \noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
  \hline
@@ -134,11 +135,21 @@ the matrix size by a factor of 5.\\
  \hline
 \end{tabular}
 
+\subsection{Apply ML to Sparse Matricies generated from CountVectorizer}
+<TODO>
 
 \section{Conclusion}
-
-
-We found that the model results and methodology for simulating training and test data for model and feature selection to be robust.  Our next recommendation is to utilize this in the production environment and evaluate whether there are trading opportunities when predicting the probability of a move versus the market implied probability from Fed Funds futures.  
+Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.
+We were able to attain maximum test accuracy of 95.9$\%$ using a 10:15 n-gram with a recall of 93.4$\%$ and an F1 score of 92.5$\%$.
+Because of the number of features generated can be in the millions, Logistic Lasso with small penatly proved to be the most effective 
+means of eliminating the large number of the coefficients. 
+The fraction of non-zero coefficients remaining after applying logistic lasso
+would range between 3e-05 to 1.6e-03.  (Compared to .97 with no regularization using logistic regression).
+Logistic regression and Logistic Lasso both broke down at extreme levels of sparsity 
+(2.5e-03). 
+MultiNomial Naive Bayes with Laplace smoothing at zero proved to be the most stable method for producing useful results at the
+most extreme measures of matrix sparcity.  In general no smoothing or large smoothing proved to give the best results with
+MultiNomial Naive Bayes.
 
 \appendix
 \section{Appendix}
