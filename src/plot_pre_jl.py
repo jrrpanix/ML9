@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import argparse
-
+import sys
 
 
 """
@@ -43,30 +43,42 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ML Spring 2019')
     parser.add_argument('-i','--input', nargs='+',default=None)
     parser.add_argument('-o','--output', default=None)
+    parser.add_argument('-d','--direction', default='h')
     parser.add_argument('-r','--range', default=None)
     parser.add_argument('--f0', nargs='+', help= "'svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'", 
                         default=['logistic_lasso', 'Naive_Bayes','nn_40', 'nn_40_40'])
     parser.add_argument('--f1', nargs='+', help= "'svm', 'logistic_lasso', 'Naive_Bayes', 'logistic'", 
                         default=['logistic_lasso', 'Naive_Bayes','svm'])
     args = parser.parse_args()
-    print(len(args.input))
-    print(args.input)
     assert len(args.input) == 2
     d0 = getdf(args.input[0])
     d1 = getdf(args.input[1])
     output = args.output
     
-    fig, axs=plt.subplots(1,2,figsize=(20,5)) 
-    fits0 = [f.replace("_B"," B") for f in args.f0]
-    title0 = r'$E[D_t|Agg(St_{t-i}, Min_{t-j}, Sp_{t-k}),NGram]$'
-    compareFits(axs[0],d0, fits0, None, args.range, title0, xaxis='NGram Length')
+    if args.direction not in ['h','v']:
+      sys.exit("--direction is either 'v' or 'h'")
+    elif args.direction == 'h':
+      fig, axs=plt.subplots(1,2,figsize=(20,5)) 
+      fits0 = [f.replace("_B"," B") for f in args.f0]
+      title0 = r'$E[D_t|Agg(St_{t-i}, Min_{t-j}, Sp_{t-k}),NGram]$'
+      compareFits(axs[0],d0, fits0, None, args.range, title0, xaxis='NGram Length')
 
+      fits1 = [f.replace("_B"," B") for f in args.f1]
+      title1 = r'$E[D_t|St_{t-i}, Min_{t-j}, Sp_{t-k},NGram]$'
+      compareFits(axs[1],d1, fits1, None, args.range, title1, xaxis="NGram Length")
+      plt.subplots_adjust(hspace=.4)
+    
+    else:
+      fig, axs=plt.subplots(2,1,figsize=(6,6)) 
+      fits0 = [f.replace("_B"," B") for f in args.f0]
+      title0 = r'$E[D_t|Agg(St_{t-i}, Min_{t-j}, Sp_{t-k}),NGram]$'
+      compareFits(axs[0],d0, fits0, None, args.range, title0, xaxis='NGram Length')
+      fits1 = [f.replace("_B"," B") for f in args.f1]
+      title1 = r'$E[D_t|St_{t-i}, Min_{t-j}, Sp_{t-k},NGram]$'
+      compareFits(axs[1],d1, fits1, None, args.range, title1, xaxis="NGram Length")
+      plt.subplots_adjust(hspace=.4)
+    
 
-    fits1 = [f.replace("_B"," B") for f in args.f1]
-    title1 = r'$E[D_t|St_{t-i}, Min_{t-j}, Sp_{t-k},NGram]$'
-    compareFits(axs[1],d1, fits1, None, args.range, title1, xaxis="NGram Length")
-
-    plt.subplots_adjust(hspace=.4)
     if output is not None:
         plt.savefig("{}.pdf".format(output), bbox_inches='tight')
     else:
