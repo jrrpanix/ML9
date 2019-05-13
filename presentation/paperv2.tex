@@ -186,7 +186,7 @@ is the larger regularization parameter reduces the fraction of non-zero coeffici
  \hline
 \end{tabular}
 
-
+\subsubsection{A comparision of Multinomial Naive Bayes to Logistic Regression with extrem sparse Matricies}
 
 
 
@@ -194,11 +194,12 @@ is the larger regularization parameter reduces the fraction of non-zero coeffici
 Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.
 We were able to attain maximum test accuracy of 95.9$\%$ using a 10:15 n-gram with a recall of 93.4$\%$ and an F1 score of 92.5$\%$.
 Because of the number of features generated can be in the millions, Logistic Lasso with small penatly proved to be the most effective 
-means of eliminating the large number of the coefficients. 
+method for reducing the number of coefficients.
 The fraction of non-zero coefficients remaining after applying logistic lasso
-would range between 3e-05 to 1.6e-03.  (Compared to .97 with no regularization using logistic regression).
+ranged between 3e-05 to 1.6e-03.  (Compared to .97 with no regularization using logistic regression).
 Logistic regression and Logistic Lasso both broke down at extreme levels of sparsity 
-(2.5e-03). 
+(2.5e-03).
+In general the Regularization parameter at the extremes produced inferior results.
 MultiNomial Naive Bayes with Laplace smoothing at zero proved to be the most stable method for producing useful results at the
 most extreme measures of matrix sparcity.  In general no smoothing or large smoothing proved to give the best results with
 MultiNomial Naive Bayes.
