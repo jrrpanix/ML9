@@ -101,8 +101,12 @@ def PlotL1(f1, output=None, showMinMax=False):
 # Plot the Number of Elements in the Matricies for different NGrams with
 # Stacking and UnStacking Documents
 #   
-def matrixSize(f1, output=None):
+def matrixSize(f1, output=None, f2=None):
     d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+
     ng = sorted(d1["NGram"].unique(), key = lambda x : int(x.split(':')[0])*10 + int(x.split(':')[1]))
     ds = d1[d1["Stack"] == True]
     dns = d1[d1["Stack"] == False]
@@ -127,7 +131,43 @@ def matrixSize(f1, output=None):
     plt.legend()
     showOrSave(output)
 
-def sparse(f1, output=None):
+#
+# Plot the Number of Elements in the Matricies for different NGrams with
+# Stacking and UnStacking Documents
+#   
+def matrixSparse(f1, output=None, f2=None):
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    sparse_min = d1.sparcity.min()
+    ng = sorted(d1["NGram"].unique(), key = lambda x : int(x.split(':')[0])*10 + int(x.split(':')[1]))
+    ds = d1[d1["Stack"] == True]
+    dns = d1[d1["Stack"] == False]
+    label, nf_ns, nf_s = [], [], []
+    skip = ['8:8', '12:12', '15:15'] # remove a couple of ngrams ot make it fit nicely on x axis
+    skip = []
+    for i in range(len(ng)):
+        dxs = ds[ds['NGram'] == ng[i]]
+        dxns = dns[dns['NGram'] == ng[i]]
+        if len(dxs) == 0 or len(dxns) == 0: continue
+        if ng[i] in skip : continue
+        label.append(ng[i])
+        nf_ns.append(dxns.sparcity.mean())
+        nf_s.append(dxs.sparcity.mean())
+    ind = np.arange(len(label)) 
+    width = 0.15
+    plt.title('NGram Sparsity')
+    plt.bar(ind-width/2,nf_s, width, label='stacked')
+    plt.bar(ind+width/2,nf_ns, width, label='unstacked')
+    plt.xticks(ind+width, label)
+    plt.xlabel("ngrams")
+    plt.ylabel("matrix sparcity")
+    plt.legend()
+    showOrSave(output)
+
+
+def sparse(f1, output=None, f2=None):
     d1 = pd.read_csv(f1)
     ds = d1[d1["Stack"] == True]
     nfs = ds["NF"].values/1e6
@@ -239,6 +279,28 @@ def modelRanking(f1, output=None, f2=None):
     plt.legend()
     showOrSave(output)
 
+def createTable(f1, output=None, f2=None):
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    ng = sorted(d1["NGram"].unique(), key = lambda x : int(x.split(':')[0])*10 + int(x.split(':')[1]))    
+    ds = d1[d1["Stack"] == True]
+    dns = d1[d1["Stack"] == False]
+    for i in range(len(ng)):
+        dxs = ds[ds['NGram'] == ng[i]]
+        dxns = dns[dns['NGram'] == ng[i]]
+        if len(dxs) == 0 and len(dxns) == 0: continue
+        if len(dxs) == 0 : dxs = dxns
+        elif len(dxns) == 0 : dxns = dxs
+        bestS = dxs[dxs["F1"] == dxs.F1.max()].iloc[0]["Model Name"]
+        bestNS = dxns[dxns["F1"] == dxns.F1.max()].iloc[0]["Model Name"]
+        worstS = dxs[dxs["F1"] == dxs.F1.min()].iloc[0]["Model Name"]
+        worstNS = dxns[dxns["F1"] == dxns.F1.min()].iloc[0]["Model Name"]
+        print("%10s, %10.8f, %10.8f, %7.0f, %7.0f, %10.0f, %10.0f, %7.0f, %7.0f, %6.4f, %6.4f, %6.4f, %6.4f, %s, %s, %s, %s"  % 
+              (ng[i], dxns.sparcity.mean(), dxs.sparcity.mean(), dxns.NF.mean(), dxs.NF.mean(), dxns.sz.mean(), dxs.sz.mean(), dxns.nz.mean(), dxs.nz.mean(), dxns.F1.mean(), dxs.F1.mean(),dxns.F1.max(), dxs.F1.max(), bestNS, bestS, worstNS, worstS))
+
+
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
     # python ./analysis.py -i ../analysis/all_lasso.csv -r size -o [to save to file]
@@ -277,7 +339,9 @@ if __name__ == '__main__':
     if args.run == 'l1':
         PlotL1(f1, args.output)
     elif args.run == 'size':
-        matrixSize(f1, args.output)
+        matrixSize(f1, args.output, f2)
+    elif args.run == 'nsparse':
+        matrixSparse(f1, args.output, f2)
     elif args.run == 'sparse':
         sparse(f1, args.output)
     elif args.run == 'smooth':
@@ -288,3 +352,5 @@ if __name__ == '__main__':
         performanceSparsity(f1, args.output, f2, args.limit) 
     elif args.run == 'rank':
         modelRanking(f1, args.output, f2)
+    elif args.run == 'table':
+        createTable(f1, args.output, f2)
