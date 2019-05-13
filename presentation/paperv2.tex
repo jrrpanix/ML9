@@ -152,14 +152,17 @@ A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
 \end{equation*}
 \end{itemize}
 
+\subsubsection{The impact of regularization coefficient $\alpha$ on logistic regression}
 \noindent 
-For \textbf{Logistic Lasso} we are interested in examining the impact of the regularization parameter on
+For \textbf{Logistic Lasso} we are interested in examining the impact of the regularization parameter $\alpha$ on
 the fraction of  non-zero coefficients remaining after regularization is applied and on the impact of the predictive
-score on test data. \\
+score on test data. The results show the regularization parameter at the extremes produces the worst results
+and the stacked model has a higher fraction of coefficients eliminated from logistic lasso. The expected result
+is the larger regularization parameter reduces the fraction of non-zero coefficients.\\
 
 \noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
  \hline
- \multicolumn{6}{|c|}{Comparision of Logistic Lasso with different regularization} \\
+ \multicolumn{6}{|c|}{Comparision of Logistic Lasso varying regularization coefficient $\alpha$} \\
  \hline
  \multicolumn{1}{|c|}{} &
  \multicolumn{1}{|c|}{} &
