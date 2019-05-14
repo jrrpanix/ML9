@@ -251,12 +251,30 @@ Logistic Lasso with a larger penalty $>2.0$ does not perform will with extremely
  \hline
 \end{tabular}
 \end{center}
+\vertSpace
+\noindent Below is a plot showing Naive Bayes giving consistent results relative
+to Logistic Lasso .
 
 \begin{figure}[h!]
-  \includegraphics[width=\linewidth]{../output/analysis/unstacked-nb-ll.JPG}
+  \centering
+  \includegraphics[width=100mm]{./ngramlen_nb_ll.pdf}
   \caption{F1 performance of LL and NB - Unstacked Model}
 \end{figure}
 
+\subsubsection{Impact of N-gram sequences on results}
+We varied the N-gram sequences to observe its impact on out of sample prediction.  There is a definite range of N-gram sequences where all of the models greatly improved. 
+All of the models showed great improvement when the n-gram sequences ranged between 4:6 and 10:15.  As the sequences started getting larger than 20 words, the results
+started to fall off as Feature matricies became more sparse.  Below is a graph of various both Logistic Lasso and Naive Bayes plotted for
+different regularizaion coefficients while varying the N-gram sequence.  The interesting part about this is Federal Reserve commentary tends to have sequences
+of hawkish or dovish sentiment which can't be expressed in a few words which might be the reason why smaller n-gram sequences did not perform as well.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=100mm]{./ngram_seq.pdf}
+  \caption{N-gram sequence LL and NB - Stacked Model}
+\end{figure}
+\vfill
+
+\vertSpace
 
 \section{Conclusion}
 Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.  \vertSpace
@@ -270,12 +288,14 @@ The fraction of non-zero coefficients remaining after applying Logistic Lasso ra
 
 Logistic Lasso (and Logistic Regression generally) broke down at the most extreme levels of sparsity $<0.0020$.  In general, we found that setting the regularization parameters at the extremes ($\alpha=0.0$ or $\alpha > 2.0$) produced inferior results.  \vertSpace 
 
+We found that n-gram sequences of varying between 4:7 to 10:15 provided the best results. Smaller n-gram sequences ($< 4$ words) and larger sequences ($>20$ do to extreme sparsity) did not generate good results.
 
 Whereas Multinomial Naive Bayes with Laplace smoothing $=0$ was the most stable method for producing useful results at the most extreme measures of matrix sparcity.  In general we found that when using Multinomial Naive Bayes setting the parameters at no smoothing or large smoothing proved to give the best results. \vertSpace  
 
 
-Overall our research found that Logistic Lasso with $\alpha = 0.002$ produced the most stable results for predicting FOMC rate decisions from FOMC statements, minutes, and Board of Governors speeches.
+Overall our research found that Logistic Lasso with smaller penalty $\alpha < 0.02$ produced the most stable results for predicting FOMC rate decisions from FOMC statements, minutes, and Board of Governors speeches.
 
+The limitation in this study is the size of the data sets. While we were able to identify charactersistics that would help predictive power the strength of the conclusions are tempered by the amount of data on hand.
 
 
 \appendix
