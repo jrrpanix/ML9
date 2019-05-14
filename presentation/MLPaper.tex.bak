@@ -22,7 +22,7 @@
 
 
 %----------------------------------------------------------------
-\title{Predicting FOMC Actions using NLP; Assessing the impact of matrix sparsity and regularization}
+\title{Predicting FOMC Actions using NLP; Assesing the impact of matrix sparsity and regularization}
 \author{
         Jeremy Lao - jjl359 \\
         NYU Computer Science \\
@@ -41,10 +41,10 @@
 In this paper we use Natural Language Processing (NLP) and Machine Learning (ML) methods to predict Federal Open Market Committee (FOMC) rate actions (hold or change) using text from FOMC meeting minutes, Board of Governors speeches, and FOMC post-meeting statements.  \vertSpace
 
  
-For this analysis we used 713 separate documents (roughly 1.6 Million Words) and 148 Fed Decisions for our data set.  We employ the NLP bag-of-words model for our analysis.  Bag-of-words models have high dimensionality, meaning the space is extremely sparse with a large amount of features leading to a sparse feature matrix.  We found in our analysis that some of the feature matrices contained over two billion elements with as little as $0.25\%$ of the elements containing a non-zero value.  \vertSpace
+For this analysis we used 713 separate documents (rougly 1.6 Million Words) and 148 Fed Decisions for our data set.  We employ the NLP bag-of-words model for our analysis.  Bag-of-words models have high dimensionality, meaning the space is extremely sparse with a large amount of features leading to a sparse feature matrix.  We found in our analysis that some of the feature matricies contained over two billion elements with as little as $0.25\%$ of the elements containing a non-zero value.  \vertSpace
 
 
-Due to these modeling challenges, the analysis and techniques we used address the issue of features being magnitudes larger than the label size ($p>>n$), and the extreme sparsity in the feature matrix.  In order to determine the appropriate model, n-gram size, and model parameters, we created a simulator to detect positive or negative sentiment from randomly generated text.  \vertSpace 
+Due to these modelling challenges, the analysis and techniques we used address the issue of features being magnitudes larger than the label size ($p>>n$), and the extreme sparsity in the feature matrix.  In order to determine the appropriate model, n-gram size, and model parameters, we created a simulator to detect positive or negative sentiment from randomly generated text.  \vertSpace 
 
 
 Our model simulator found that as the number of sentiment words increased, the prediction accuracy approached close to 1.0 with high F1 scores.  For the study the analysis hones in on the mix of distributions containing hawkish or dovish (positive-action) words.
@@ -56,7 +56,7 @@ Our model simulator found that as the number of sentiment words increased, the p
 \section{Objectives}
 \begin{enumerate}
 \item Given the proliferation of robust open-source ML and NLP packages, we were motivated to understand the characteristics of the feature matrix output (i.e., document-term matrix) from the text processing functions (i.e., CountVectorizer) analyzing the number of features, matrix sparsity, and matrix norm generated from utilizing package functions.
-\item Assess the effectiveness of Multinomial Naive Bayes and Logistic Lasso applied to problems where the feature size is orders of magnitudes larger than the label size ($p>>n$).
+\item Assess the effectiveness of Multinomial Niave Bayes and Logistic Lasso applied to problems where the feature size is orders of magnitues larger than the label size ($p>>n$).
 \item Determine whether ML and NLP methods can be used to predict FOMC action (no change or a change in the base rate) using FOMC statements, minutes, and Board of Governors speeches.
 \item Measure model performance on F1 scores because $70\%$ of the actions over the nineteen year period we are measuring are ``no action''.  F1 scores ensure that the accuracy of the model is not based purely on a naive ``no action'' guess, which in the best case would give a $70\%$ model accuracy.
 \item Create scraping and cleaning tools to assemble a corpus of documents containing Speeches, Statements, Minutes and Actions from the Federal Reserve.
@@ -66,7 +66,7 @@ Our model simulator found that as the number of sentiment words increased, the p
 
 \subsection{Data}
 
-The time frame of our study covered 2000 to 2018. We primarily utilized three sources for our data, FOMC statements, FOMC meeting minutes, and Board of Governors speeches. Details on data-sources, extraction and scrubbing are left to the appendix to focus this paper on analyzing our methods and results.  Preparing the data was a large amount of work and we are not aware of any data sets that combine the three types of documents and mapped the documents to an FOMC Action.
+The time frame of our study covered 2000 to 2018. We primarily utilized three sources for our data, FOMC statements, FOMC meeting minutes, and Board of Governors speeches. Details on datasources, extraction and scrubbing are left to the appendix to focus this paper on analyzing our methods and results.  Preparing the data was a large amount of work and we are not aware of any data sets that combine the three types of documents and mapped the documents to an FOMC Action.
 
 \subsection{Feature Modeling and Data Label Mapping}
 \noindent Documents are mapped to the first FOMC rate decision on or before the document date at time $t_i$, where $j=\text{Statement}$ or $j=\text{Speech}$ or $j=\text{Minutes}$
@@ -88,7 +88,7 @@ $$E[D_{t_i}] = f(ngram(n_1, n_2)[\mbox{Document}_{j,t_i-k}])$$
 
 \noindent
 \textbf{Model 2: Stacked}\\
-The \textbf{Stacked} model maps the set of documents which occur after the previous decision date but on or before the next decision date to one rate decision.  We effectively concatenated the documents between decisions into one large document.  The ``stacked'' model reduces the number of documents from 713 to 148, and we expect this method to reduce the dimensionality of the space.  This model maintains the same n-gram based feature vector where $n_1 <= n_2$ and $n_i$ are integers $>0$.
+The \textbf{Stacked} model maps the set of documents which occurr after the previous decision date but on or before the next decision date to one rate decision.  We effectively concatenated the documents between decisions into one large document.  The ``stacked'' model reduces the number of documents from 713 to 148, and we expect this method to reduce the dimensionality of the space.  This model maintains the same n-gram based feature vector where $n_1 <= n_2$ and $n_i$ are integers $>0$.
 
 $$E[D_{t_i}] = f(ngram(n_1, n_2)[\mbox{Document}_{j_1,t_i-k_1},{Document}_{j_2,t_i-k_2},...]) \text{, } t_i-1 < t_i-k_i < t_i+1$$
 
@@ -97,12 +97,12 @@ $$E[D_{t_i}] = f(ngram(n_1, n_2)[\mbox{Document}_{j_1,t_i-k_1},{Document}_{j_2,t
 \noindent For this study we used term frequencies generated from \textbf{CountVectorizer} (\textbf{TfiDf} can also be used, but it did not alter the conclusions of this study).  When an n-gram is applied to a corpus of documents $D$, one can deduce from basic combinatorics that a large number of features will be generated from various mixtures of case studies.  \vertSpace
 
 
-As we mentioned in our introduction, the classic problem with NLP bag-of-words models is that most of the column entries (n-grams) are zero, resulting in extremely sparse matrices.  
+As we mentioned in our introduction, the classic problem with NLP bag-of-words models is that most of the column entries (n-grams) are zero, resulting in extremly sparse matricies.  
 Sparsity is defined as:
 
 $$\mbox{sparsity} = \frac{\mbox{non-zero elements}}{\mbox{total elements}}$$
 
-The table below gives a measure of sparsity  and the resulting number of elements in each n-gram generated matrix (units are in billions).  We empirically observed that the ``stacked'' model reduces the sparsity by a factor of four and the matrix size by a factor of five. The L1 matrix norm for all of the matrices ranged between 1200 to 1600.\\
+The table below gives a measure of sparsity  and the resulting number of elements in each n-gram generated matrix (units are in billions).  We empirically observed that the ``stacked'' model reduces the sparsity by a factor of four and the matrix size by a factor of five. The L1 matrix norm for all of the matricies ranged between 1200 to 1600.\\
 
 \noindent 
 \begin{center}
@@ -132,7 +132,7 @@ The table below gives a measure of sparsity  and the resulting number of element
 
 
 
-\subsection{Apply ML to Sparse Matrices generated from CountVectorizer}
+\subsection{Apply ML to Sparse Matricies generated from CountVectorizer}
 \noindent
 Based upon research into classification models for sparse data, we chose to test Naive Bayes and Logistic Regression with L1 regularization.  \vertSpace
 
@@ -153,7 +153,7 @@ A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
 For the ``Unstacked'' document case, our research into classification model performance on sparse data found that Naive Bayes classification models performed particularly well when encountering cases of missing data.  Naive Bayes takes advantage of the assumption that the attributes are independent and ignores missing attributes when calculating the probability.  Therefore, Naive Bayes is generally considered a fairly decent performer with greater sparsity.  \vertSpace  
 
 
-Based on the table above called ``Count Vector Size'', we decided to test Logistic Lasso as we found in our research that Logistic Lasso can handle sparsity through identifying a set of relevant variables out of the large collection of candidates making it suitable for discovering interactions in regression problems (HW1 problem 2). \vertSpace 
+Based on the table above called ``Count Vector Size'', we decided to test Logistic Lasso as we found in our research that Logistic Lasso can handle sparsity through identifying a set of relevant variables out of the large collection of candidates making it suitable for discovering interactions in regresssion problems (HW1 problem 2). \vertSpace 
 
 
 
@@ -161,7 +161,7 @@ Based on the table above called ``Count Vector Size'', we decided to test Logist
 
 \subsubsection{Training, Testing, and Determining the Efficacy of the Models}
 For this study we randomly sample 75$\%$ of the corpus for training and then 
-predict Fed action using the remaining 25$\%$ of the data and calculate
+predict Fed action using the ramining 25$\%$ of the data and calculate
 \begin{itemize}
 \item Accuracy
 \item Precision
@@ -182,7 +182,7 @@ is the larger regularization parameter reduces the fraction of non-zero coeffici
 
 \noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
  \hline
- \multicolumn{6}{|c|}{Comparison of Logistic Lasso varying regularization coefficient $\alpha$} \\
+ \multicolumn{6}{|c|}{Comparision of Logistic Lasso varying regularization coefficient $\alpha$} \\
  \hline
  \multicolumn{1}{|c|}{} &
  \multicolumn{1}{|c|}{} &
@@ -206,7 +206,7 @@ is the larger regularization parameter reduces the fraction of non-zero coeffici
  \hline
 \end{tabular}
 
-\subsubsection{A comparison of Multinomial Naive Bayes to Logistic Regression with Extremely Sparse Feature Matrices}
+\subsubsection{A comparision of Multinomial Naive Bayes to Logistic Regression with Extremely Sparse Feature Matrices}
 \noindent
 Under extreme levels of sparseness (sparseness measure of less than $0.0021$) from feature matrices generated by CountVectorizer, Logistic Regression and Logistic Lasso break down with greater sparseness while Multinomial Naive Bayes can still produce usable results. \vertSpace
 
@@ -214,12 +214,12 @@ Under extreme levels of sparseness (sparseness measure of less than $0.0021$) fr
 However, we found with less matrix sparsity and a lower Logistic Lasso model penalty (i.e., $\alpha=0.002$), the Logistic Lasso model performance improves.  Based on F1 scores we observed that Logistic Lasso with low penalties performs as well or better than Naive Bayes when sparseness exceeded $0.0025$.  \vertSpace
 
 
-Logistic Lasso with a larger penalty (i.e., $>2.0$) does not perform well with extremely sparse matrices. \\
+Logistic Lasso with a larger penalty (i.e., $>2.0$) does not perform well with extremely sparse matricies. \\
 \begin{center}
 \noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
  \hline
 
- \multicolumn{5}{|c|}{Deterioration of Logistic Lasso with sparse matrices relative to Naive Bayes} \\
+ \multicolumn{5}{|c|}{Deterioration of Logistic Lasso with sparse matricies relative to Naive Bayes} \\
  \hline
  \multicolumn{1}{|c|}{} &
  \multicolumn{1}{|c|}{} &
@@ -258,7 +258,7 @@ to Logistic Lasso .
 \end{figure}
 
 \subsubsection{Impact of N-gram sequences on results}
-We varied the N-gram sequences to observe its impact on our model predictions.  Based on our empirical observations there is a definite range of N-gram sequences where all of the models greatly improve (based on F1 scores).  All of the models showed great improvement when the N-gram sequences ranged between 4:6 and 10:15.  As the sequences (N-grams) approached 20 words and larger, the results (model performance) started to deteriorate as the feature matrices became more sparse.  Below is a graph of Logistic Lasso and Naive Bayes plotted with different regularization coefficients and varying N-gram sequence.  \vertSpace
+We varied the N-gram sequences to observe its impact on our model predictions.  Based on our empirical observations there is a definite range of N-gram sequences where all of the models greatly improve (based on F1 scores).  All of the models showed great improvement when the N-gram sequences ranged between 4:6 and 10:15.  As the sequences (N-grams) approached 20 words and larger, the results (model performance) started to deteriorate as the feature matricies became more sparse.  Below is a graph of Logistic Lasso and Naive Bayes plotted with different regularizaion coefficients and varying N-gram sequence.  \vertSpace
 
 
 The interesting part about our findings is that Federal Reserve commentary tends to have sequences of hawkish or dovish sentiment (FOMC action) which can't be expressed in a few words.  This expression of hawkishness or dovishness in larger N-grams may be the reason why smaller B-gram sequences did not perform as well.
@@ -272,10 +272,10 @@ The interesting part about our findings is that Federal Reserve commentary tends
 \vertSpace
 
 \section{Conclusion}
-Reducing the sparsity of the matrices generated from CountVectorizer by stacking the documents greatly improved the results.  \vertSpace
+Reducing the sparsity of the matricies generated from CountVectorizer by stacking the documents greatly improved the results.  \vertSpace
 
 
-We were able to attain maximum test accuracy of $95.9\%$ using a $10:15$ n-gram, producing a recall of $93.4\%$ and an F1 score of $92.5\%$.  Because of the large number (i.e., millions) of features in the feature matrix, Logistic Lasso with small penalty proved to be the most effective method for reducing the number of coefficients, leading to improved F1 scores.  \vertSpace
+We were able to attain maximum test accuracy of $95.9\%$ using a $10:15$ n-gram, producing a recall of $93.4\%$ and an F1 score of $92.5\%$.  Because of the large number (i.e., millions) of features in the feature matrix, Logistic Lasso with small penatly proved to be the most effective method for reducing the number of coefficients, leading to improved F1 scores.  \vertSpace
 
 
 The fraction of non-zero coefficients remaining after applying Logistic Lasso ranged between $3e-05$ to $1.6e-03$.  Logistic Lasso was very effective in dealing with feature matrix sparsity, and based on what we learned from HW1 question two is the appropriate model choice for our classification problem.  In order to illustrate the effectiveness, we measured the fraction of non-zero coefficients using a Logistic Regression model and the feature matrix had $\approx 97\%$ non-zero coefficients.  \vertSpace 
@@ -291,7 +291,7 @@ Whereas Multinomial Naive Bayes with Laplace smoothing $=0$ was the most stable 
 Overall our research found that Logistic Lasso with smaller penalty $\alpha < 0.02$ produced the most stable results for predicting FOMC rate decisions from FOMC statements, minutes, and Board of Governors speeches.\vertSpace
 
 
-The limitation in this study is the size of the data sets. While we were able to identify characteristics that would help predictive power the strength of the conclusions are tempered by the amount of data on hand.
+The limitation in this study is the size of the data sets. While we were able to identify charactersistics that would help predictive power the strength of the conclusions are tempered by the amount of data on hand.
 
 
 \appendix
@@ -303,7 +303,7 @@ The FOMC sets the Federal Funds target range (target rate prior to 2009).  The p
 
 \subsection{Why Does the Federal Funds Target Range Matter?}
 
-The Federal Funds Target Range is set by the FOMC.  The Federal Funds Target Range is the range where the Federal Funds Effective rate (calculated as the volume weighted median of eligible transactions reported on FR 2420) is expected to fix on a daily basis.  The Federal Funds rate is the primary monetary policy instrument of the Federal Reserve System, and it influences the level of interest rates domestically and globally.  For example, if the Federal Funds effective rate were 5 percent, then the interest rate on a 30 year mortgage would be 5 percent or greater.  
+The Federal Funds Target Range is set by the FOMC.  The Federal Funds Target Range is the range where the Federal Funds Effective rate (calculated as the volumn weighted median of eligible transactions reported on FR 2420) is exepected to fix on a daily basis.  The Federal Funds rate is the primary monetary policy instrument of the Federal Reserve System, and it influces the level of interest rates domestically and globally.  For example, if the Federal Funds effective rate were 5 percent, then the interest rate on a 30 year mortgage would be 5 percent or greater.  
 
 \subsection{Data}
 
@@ -337,7 +337,7 @@ This formed the bulk of our text pre-processing and it allowed us to essentially
  \hline
  \multicolumn{6}{|c|}{FOMC Documents} \\
  \hline
- Document Type& Years & Number Documents & Total Words & Avg Words Per Document & StDev\\
+ Document Type& Years & Num Documents & Total Words & Avg Words Per Document & StDev\\
  \hline
  Minutes   & 2000-2018    & 149 & 738,656 & 4,957 & 1,284\\
  Statements &   2000-2018  & 160   & 62,350 & 389 & 185\\
@@ -354,7 +354,7 @@ Statements are post-meeting communiqu\'e and are generally short, but contains a
 
 \subsection{Latent Dirichlet Allocation}
 
-We explored latent topic modeling in our research to determine how a machine learning algorithm would classify $k=3$ topics, a proxy for the Federal Reserve's three objectives. \vertSpace
+We explored latent topic modelling in our research to determine how a machine learning algorithm would classify $k=3$ topics, a proxy for the Federal Reserve's three objectives. \vertSpace
 
 
 Given the Federal Reserve's mandates of stable prices, maximum employment, and financial stability, we explored Latent Dirichlet Distribution of the speeches and minutes' word distribution over three latent topics.  We were interested in exploring how well a topic model would distribute words over the three objectives and if the meaning of the distributions were relatively clear.  
@@ -373,7 +373,7 @@ We found that the topic model generally distributed the speeches and minutes int
 %-----------------------------------------------------------------
 \begin{thebibliography}{99}
 
-\bibitem{Cd94} Hansen,Stephen, McMachon, Michael  \emph{Transparency and Deliberation with the FOMC:a Computational Linguistics Approach}, CEPR Discussion Paper, (2014)
+\bibitem{Cd94} Hansen,Stephen, McMachon, Michael  \emph{Transparency and Deliberation with the FOMC:a Computational Linquistics Approach}, CEPR Discussion Paper, (2014)
 
 \bibitem{stanford} Puri, Indira \emph{Using Machine Learning to Predict Interest Rate Changes from Federal Reserve Proceedings}
 
