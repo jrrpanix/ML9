@@ -123,11 +123,14 @@ As we mentioned in our introduction, the classic problem with NLP bag-of-words m
  \hline
 \end{tabular}
 
+
+
+
+
 \subsection{Apply ML to Sparse Matricies generated from CountVectorizer}
 \noindent
-For this problem the large feature size relative to the the number of labels dicitates looking
-at Bayesian approach or some from of L1 regularization (HW1 problem 2) to push a large number
-of coefficients to zero.
+Based upon research into classification models for sparse data, we chose to test Naive Bayes and Logistic Regression with L1 regularization.  \vertSpace
+
 \begin{itemize}
 \item Naive Bayes
 \begin{equation*}
@@ -139,6 +142,17 @@ P(A|x_1,x_2,...,x_n) = p(A)\prod_{i=1}^n p(x_i|A)
 A = \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}+ L1
 \end{equation*}
 \end{itemize}
+
+
+
+For the ``Unstacked'' document case, our research into classification model performance on sparse data, found that Naive Bayes classification models performed particularly well when encountering cases of missing data.  Naive Bayes takes advantage of the assumption that the attributes are independent and ignores missing attributes when calculating the probability.  Therefore, Naive Bayes is generally considered a fairly decent performer with greater sparsity.  \vertSpace  
+
+
+Based on the table above called ``Count Vector Size'', we decided to test Logistic Lasso as we found in our research that Logistic Lasso can handle sparsity well through identifying a set of relevant variables out of the large collection of candidates making it suitable for discovering interactions in regresssion problems (HW1 problem 2). \vertSpace 
+
+
+
+
 
 \subsubsection{Training, Testing and Determining the efficacy of the Models}
 For this study we randomly sample 75$\%$ of the corpus for training and then 
@@ -294,6 +308,9 @@ We found that the topic model generally distributed the speeches and minutes int
 \bibitem{stanford} Puri, Indira \emph{Using Machine Learning to Predict Interest Rate Changes from Federal Reserve Proceedings}
 
 \bibitem{nyu} Ranganath, Rajesh  \emph{NYU - CSCI-GA.2565 ML Lecture Slides Spring 2019}
-\end{thebibliography}
 
+\bibitem{NaiveBayes} Li, Xiang et al. \emph{The Convergence Behavior of Naive Bayes on Large Sparse Datasets}, ACM Vol 11 Issue 1, August 2016
+
+\bibitem{LL} Zou, Yuan and Roos, Teemu \emph{Sparse Logistic Regression with Logical Features}, Helsinki Institute for Information Technology (HIIT), Springer International, 2016
+\end{thebibliography}
 \end{document}
