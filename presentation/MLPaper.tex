@@ -281,9 +281,12 @@ We were able to attain maximum test accuracy of $95.9\%$ using a $10:15$ n-gram,
 The fraction of non-zero coefficients remaining after applying Logistic Lasso ranged between $3e-05$ to $1.6e-03$.  Logistic Lasso was very effective in dealing with feature matrix sparsity, and based on what we learned from HW1 question two is the appropriate model choice for our classification problem.  In order to illustrate the effectiveness, we measured the fraction of non-zero coefficients using a Logistic Regression model and the feature matrix had $\approx 97\%$ non-zero coefficients.  \vertSpace 
 
 
-Logistic Lasso (and Logistic Regression generally) broke down at the most extreme levels of sparsity $<0.0020$.  In general, we found that setting the regularization parameters at the extremes ($\alpha=0.0$ or $\alpha > 2.0$) produced inferior results.  \vertSpace 
+Logistic Lasso (and Logistic Regression generally) broke down at the most extreme levels of sparsity $<0.0020$.  In general, we found that setting the regularization parameters at the extremes ($\alpha=0.0$ or $\alpha > 2.0$) produced inferior results.  \vertSpace
 
-We found that n-gram sequences of varying between 4:7 to 10:15 provided the best results. Smaller n-gram sequences ($< 4$ words) and larger sequences ($>20$ do to extreme sparsity) did not generate good results.
+ 
+
+We found that n-gram sequences of varying between 4:7 to 10:15 provided the best results. Smaller n-gram sequences ($< 4$ words) and larger sequences ($>20$ do to extreme sparsity) did not generate good results.  \vertSpace
+
 
 Whereas Multinomial Naive Bayes with Laplace smoothing $=0$ was the most stable method for producing useful results at the most extreme measures of matrix sparcity.  In general we found that when using Multinomial Naive Bayes setting the parameters at no smoothing or large smoothing proved to give the best results. \vertSpace  
 
