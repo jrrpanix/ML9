@@ -7,24 +7,18 @@ import argparse
 def save(d1, fname):
     d1.to_csv(fname, index=False)
 
-def getUnique(d1):
-    # Make Sure No Duplicate Models in DataFrame
-    d1["N"].apply(lambda x : int(x))
-    d1["C"] = [1/float(s.split("Lasso")[-1]) if len(s.split("Lasso")) > 1 else 0 for s in d1["Model Name"].values]
-    d1["id"] = [d1.iloc[i]["Model Name"] + d1.iloc[i]["NGram"] + str(d1.iloc[i]["Stack"]) + str(d1.iloc[i]["Tfid"]) for i in range(len(d1))]
-    d1.set_index("id")
-    d1=d1.drop_duplicates(subset=['id'])
-    d1 = d1.sort_values(by=['F1','Model Name', 'NGram', 'Stack'],ascending=False)
-    return d1
-
-def fixf1(f1, f2, fname="./all_lasso.csv"):
-    d1 = pd.read_csv(f1)
-    d2 = pd.read_csv(f2)
-    d1 = getUnique(d1)
-    d1 = d1[d1["Tfid"] == False]
-    giant=d1.append(d2)
-    giant.drop(columns=['id'])
-    save(giant,fname)
+def colC(d1):
+    if "C" in d1.columns : return 
+    names = d1["Model Name"].values
+    nv = []
+    for s in names:
+        if "Lasso" in s:
+            v = float(s.split("Lasso")[-1]) if len(s.split("Lasso")) > 1 else 0
+            if v != 0 : v = 1/v
+        else:
+            v = float(s.split("MultiNB")[-1]) if len(s.split("MultiNB")) > 1 else 0
+        nv.append(v)
+    d1["C"] = nv
 
 #
 # for the different regularization parameters, get
@@ -39,7 +33,6 @@ def ParameterImpact(d1):
     
     # Naive Bayes model names are MultiNB+<smoothing parameter>
     # For Naive Bayse the Laplace Smoothing Parameter is alpha in sklearn
-
     g=d1.groupby(['Model Name']).agg({
             'Model Name': [lambda x : ' '.join(x)],
             'C' :['mean'],
@@ -75,6 +68,7 @@ def showOrSave(output=None):
 #    
 def PlotL1(f1, output=None, showMinMax=False):
     d1 = pd.read_csv(f1)
+    colC(d1)
     dns = d1[d1["Stack"] == False]
     modelns, xns, yns, yns_min, yns_max = ParameterImpact(dns)
 
@@ -232,8 +226,13 @@ def performanceSparsity(f1, output=None, f2=None, limit=1.0):
     if f2 is not None:
         d2 = pd.read_csv(f2)
         d1 = d1.append(d2)
-    #d1 = d1[d1["Stack"] == False]
-    show=["MultiNB0.0", "Logistic", "Logistic Lasso5.0"]
+    d1 = d1[d1["Stack"] == False]
+    #show=["MultiNB0.0", "Logistic", "Logistic Lasso5.0" , "Logistic Lasso0.0", "Logistic Lasso500.0"]
+    show=["MultiNB0.0","MultiNB1.0", "Logistic Lasso0.0", "Logistic Lasso500.0", "Logistic Lasso0.3"]
+    label=["Multinomial NB s=0.0","Multinomial NB s=1.0", "Logistic", "Logistic Lasso r=0.002", "Logistic Lasso r=30.0"]
+    #show=["MultiNB0.0", "Logistic Lasso0.0", "Logistic Lasso500.0"]
+    #label=["Multinomial NB s=0.0","Logistic", "Logistic Lasso r=0.002"]
+
     models = d1["Model Name"].unique()
     for model in models :
         if not model in show: continue
@@ -242,7 +241,9 @@ def performanceSparsity(f1, output=None, f2=None, limit=1.0):
         combo = sorted([(sz[i], f1[i]) for i in range(len(f1))], key = lambda x : x[0])
         x = [c[0] for c in combo if c[0] < limit]
         y = [c[1] for c in combo if c[0] < limit]
-        plt.plot(x,y, marker='o', label=model)
+        if len(x) == 0 : continue
+        ix = show.index(model)
+        plt.plot(x,y, marker='o', label=label[ix])
     plt.legend()
     plt.title("Matrix Sparsity vs F1")
     plt.xlabel("Matrix Sparsity")
@@ -258,6 +259,7 @@ def modelRanking(f1, output=None, f2=None):
     ngram = d1["NGram"].unique()
     combo = []
     exclude = ["6:6", "8:8", "10:10", "12:12", "20:20", "4:6", "10:15", "15:15"]
+    exclude = []
     for n in ngram:
         if n in exclude: continue
         dn = d1[d1["NGram"] == n]
@@ -297,9 +299,37 @@ def createTable(f1, output=None, f2=None):
         bestNS = dxns[dxns["F1"] == dxns.F1.max()].iloc[0]["Model Name"]
         worstS = dxs[dxs["F1"] == dxs.F1.min()].iloc[0]["Model Name"]
         worstNS = dxns[dxns["F1"] == dxns.F1.min()].iloc[0]["Model Name"]
-        print("%10s, %10.8f, %10.8f, %7.0f, %7.0f, %10.0f, %10.0f, %7.0f, %7.0f, %6.4f, %6.4f, %6.4f, %6.4f, %s, %s, %s, %s"  % 
-              (ng[i], dxns.sparcity.mean(), dxs.sparcity.mean(), dxns.NF.mean(), dxs.NF.mean(), dxns.sz.mean(), dxs.sz.mean(), dxns.nz.mean(), dxs.nz.mean(), dxns.F1.mean(), dxs.F1.mean(),dxns.F1.max(), dxs.F1.max(), bestNS, bestS, worstNS, worstS))
+        if i == 0:
+            print("%10s, %10s, %10s, %7s, %7s, %10s, %10s, %7s, %7s, %6s, %6s, %6s, %6s, %s, %s, %s, %s"  % 
+                  ("N-Gram","Sparse(US)","Sparse(S)","NF(US)","NF(S)","SZ(US)","SZ(S)","NZ","NZ","F1","F1","F1max","F1max","bestNS","bestS","worstNS","worstS"))
+        print("%10s, %10.8f, %10.8f, %7.4f, %7.4f, %10.6f, %10.6f, %7.0f, %7.0f, %6.4f, %6.4f, %6.4f, %6.4f, %s, %s, %s, %s"  % 
+              (ng[i], dxns.sparcity.mean(), dxs.sparcity.mean(), dxns.NF.mean()/1e6, dxs.NF.mean()/1e6, dxns.sz.mean()/1e9, dxs.sz.mean()/1e9, dxns.nz.mean(), dxs.nz.mean(), dxns.F1.mean(), dxs.F1.mean(),dxns.F1.max(), dxs.F1.max(), bestNS, bestS, worstNS, worstS))
 
+def table2(f1, output=None, f2=None):
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    ng = sorted(d1["NGram"].unique(), key = lambda x : int(x.split(':')[0])*10 + int(x.split(':')[1]))    
+    ds = d1[d1["Stack"] == True]
+    dns = d1[d1["Stack"] == False]
+    keep = ["10:15"]
+    for i in range(len(ng)):
+        if not ng[i] in keep: continue
+        dxs = ds[ds['NGram'] == ng[i]]
+        dxns = dns[dns['NGram'] == ng[i]]
+        if len(dxs) == 0 and len(dxns) == 0: continue
+        if len(dxs) == 0 : dxs = dxns
+        elif len(dxns) == 0 : dxns = dxs
+        for j in range(len(dxns)):
+            reg = float(dxns.iloc[j]["Model Name"].split("Logistic Lasso")[-1])
+            reg = 1/reg if reg > 0 else 0
+            print("%s & %6.3f & %5.3f & %8.6f & %5.3f & %8.6f \\\\" %
+                  (ng[i], reg,
+                   dxns.iloc[j].F1, min(dxns.iloc[j].NonZeroCoeff, 1.0),
+                   dxs.iloc[j].F1, min(dxs.iloc[j].NonZeroCoeff, 1.0)))
+                  
+    
 
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
@@ -354,3 +384,5 @@ if __name__ == '__main__':
         modelRanking(f1, args.output, f2)
     elif args.run == 'table':
         createTable(f1, args.output, f2)
+    elif args.run == 'table2':
+        table2(f1, args.output, f2)
