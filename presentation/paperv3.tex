@@ -38,43 +38,40 @@
 \abstract{\textit{The Federal Open Market Committee (FOMC) meets throughout the year to set the target Federal Funds rate.  The Federal Funds rate is one of the primary monetary policy tools, and it impacts the cost of borrowing money globally.  This paper explores ML and NLP methods, examines the impact of matrix sparsity from NLP methods and regularization from ML models, to predict the potential outcome of an upcoming FOMC using past FOMC statements and meeting minutes to train ML and NLP models.}}
 
 \section{Introduction}
-In this paper we use methods in Natural Language Processing (NLP) and Machine Learning (ML) to predict Federal Open Market Committee (FOMC) rate actions (hold or change) using text from FOMC meeting minutes, Board of Governors speeches, and FOMC post-meeting statements.  \vertSpace
+In this paper we use Natural Language Processing (NLP) and Machine Learning (ML) methods to predict Federal Open Market Committee (FOMC) rate actions (hold or change) using text from FOMC meeting minutes, Board of Governors speeches, and FOMC post-meeting statements.  \vertSpace
 
  
-For this analysis we used 713 separate documents (rougly 1.6 Million Words) and 148 Fed Decisions for our data set.  Employing the bag-of-words models have a high dimensionality, meaning the space is extremely sparse with a large amount of features leading to a sparse feature matrix.  
-In the analysis we conducted some of the feature matricies generated contained over 2 Billion elements with fractions as small as 0.0025 of the elements containing a non-zero value.  
-Our analysis and techniques used were driven by the issue of feature sizes orders of magnitued larger than the label size and the extreme degrees of sparsness in the feature matrix.  
-To make sure the analysis was at least plausible we created a simulator to detect positive or negative sentiment from randomly generated text and found as the number of sentiment words increased the prediction accuracy approached close to 1.0.  
-For the study the analysis hones in on the mix of distributions containing hawkish or dovish(positive) words.
+For this analysis we used 713 separate documents (rougly 1.6 Million Words) and 148 Fed Decisions for our data set.  We employ the NLP bag-of-words model for our analysis.  Bag-of-words models have high dimensionality, meaning the space is extremely sparse with a large amount of features leading to a sparse feature matrix.  We found in our analysis that some of the feature matricies contained over two billion elements with as little as $0.25\%$ of the elements containing a non-zero value.  \vertSpace
+
+
+Due to these modelling challenges, the analysis and techniques we used address the issue of features being magnitudes larger than the label size ($p>>n$), and the extreme sparsity in the feature matrix.  In order to determine the appropriate model, n-gram size, and model parameters, we created a simulator to detect positive or negative sentiment from randomly generated text.  \vertSpace 
+
+
+Our model simulator found that as the number of sentiment words increased, the prediction accuracy approached close to 1.0 with high F1 scores.  For the study the analysis hones in on the mix of distributions containing hawkish or dovish (positive-action) words.
+
 
 \subsection{git repository for project}
 \url{https://www.github.com/jrrpanix/ML9}
 
-\section{Objective}
+\section{Objectives}
 \begin{enumerate}
-\item Since its pretty easy to just blindly apply tools to a set of data we wanted to understand the 
-characteristics of the output from the text processing functions (in our case CountVectorizer) in terms of number of features, matrix sparsity, matrix norm
-that are generated from calls to this function.
-\item Assess the effeiveness of Multinomial Niave Bayes and Logistic Lasso applied to problmes where the feature size is orders of magnitues larger than the label size.
-\item Determine whether ML and NLP methods can be used to predict FOMC action (no change or a change in the base rate).
-\item Because 70$\%$ of the actions are ``no action'', make sure the prediction is not always just ``no action'' (which would give a 70$\%$ accuracy).
+\item Given the proliferation of robust open-source ML and NLP packages, we were driven to understand the characteristics of the feature matrix output (i.e., document-term matrix) from the text processing functions (i.e., CountVectorizer) analyzing the number of features, matrix sparsity, and matrix norm generated from utilizing packages functions.
+\item Assess the effeiveness of Multinomial Niave Bayes and Logistic Lasso applied to problems where the feature size is orders of magnitues larger than the label size ($p>>n$).
+\item Determine whether ML and NLP methods can be used to predict FOMC action (no change or a change in the base rate) using FOMC statements, minutes, and Board of Governors speeches.
+\item Measure model performance on F1 scores because $70\%$ of the actions over the nineteen year period we are measuring are ``no action''.  F1 scores ensure that the accuracy of the model is not based purely on a naive ``no action'' guess, which in the best case would give a $70\%$ model accuracy.
 \end{enumerate}
 
 \section{Methodology}
 
 \subsection{Data}
 
-The time frame of our study covered 2000 to 2018. 
-We primarily utilized three sources for our data, FOMC statements, FOMC meeting minutes and Boarde of Governors speeches.
-Details on datasources, extraction and scrubbing are left to the appendix to keep the focus on the methods and results.
-Preparing the data was a large amount of work and we are not aware of any data sets that combine the three types of documents
-and then map the documents to a Fed Action.
+The time frame of our study covered 2000 to 2018. We primarily utilized three sources for our data, FOMC statements, FOMC meeting minutes, and Boarde of Governors speeches. Details on datasources, extraction and scrubbing are left to the appendix to focus this paper on analyzing our methods and results.  Preparing the data was a large amount of work and we are not aware of any data sets that combine the three types of documents and mapped the documents to an FOMC Action.
 
 \subsection{Feature Modeling and Data Label Mapping}
-\noindent Documents are mapped to the first rate decision on or before the document date at time $ti$
-where $j=\text{Statement}$ or $j=\text{Speech}$ or $j=\text{Minutes}$
+\noindent Documents are mapped to the first rate decision on or before the document date at time $t_i$, where $j=\text{Statement}$ or $j=\text{Speech}$ or $j=\text{Minutes}$
+
 \begin{equation*}
-\mbox{Document}_{j,ti} \rightarrow \mbox{Decision}_{ti+k}
+\mbox{Document}_{j,t_i} \rightarrow \mbox{Decision}_{t_i+k}
  = \begin{cases}
   1, & \text{if  Decision = change}, \\
   0, & \text{if  Decision = no change}
@@ -84,35 +81,25 @@ where $j=\text{Statement}$ or $j=\text{Speech}$ or $j=\text{Minutes}$
 \noindent 
 \textbf{Model 1: Unstacked}\\
 \noindent
-The \textbf{Unstacked} model maps each document to a feature vector generated by CountVector given an n-gram($n_1$, $n_2$)
-where $n_1 <= n_2$ and $n_i$ are integers $>0$. Given there are approximately 713 documents, this will generate
-a feature matrix with 713 rows and $K$ columns where each column will be and instance of the word sequence
-generated by the n-gram.
+The \textbf{Unstacked} model maps each document to a feature vector generated by CountVector given an n-gram ($n_1$, $n_2$) where $n_1 <= n_2$ and $n_i$ are integers $>0$.  Given that our corpus consisted of approximately 713 documents, this will generate a feature matrix with 713 rows and $K$ columns where each column will be a unique instance of the word sequence generated by the n-gram.
 
 \begin{equation*}
-E[D_ti] = f(ngram(n_1, n_2)[\mbox{Document}_{j,ti-k}])
+E[D_{t_i}] = f(ngram(n_1, n_2)[\mbox{Document}_{j,t_i-k}])
 \end{equation*}
 
 \noindent
 \textbf{Model 2: Stacked}\\
-The \textbf{Stacked}  model maps the set of documents which occurr after the previous decision date but on or before the
-next decision date to one rate decision.  This has the effect of contatenating the documents between decisions into
-one large document, but cuts down the number from 713 to 148.
-where $n_1 <= n_2$ and $n_i$ are integers $>0$. Given there are approximately 713 documents, this will generate
-a feature matrix with 713 rows and $K$ columns where each column will be and instance of the word sequence
-generated by the n-gram.
+The \textbf{Stacked} model maps the set of documents which occurr after the previous decision date but on or before the next decision date to one rate decision.  We effectively concatenated the documents between decisions into one large document.  The ``stacked'' model reduces the number of documents from 713 to 148, and we expect this method to reduce the dimensionality of the space.  This model maintains the same n-gram based feature vector where $n_1 <= n_2$ and $n_i$ are integers $>0$.
 
 \begin{equation*}
-E[D_{ti}] = f(ngram(n_1, n_2)[\mbox{Document}_{j1,ti-k1},{Document}_{j2,ti-k2},...]) \text{, } ti-1 < ti-ki < ti+1
+E[D_{t_i}] = f(ngram(n_1, n_2)[\mbox{Document}_{j_1,t_i-k_1},{Document}_{j_2,t_i-k_2},...]) \text{, } t_i-1 < t_i-k_i < t_i+1
 \end{equation*}
 
 \subsection{Matrix Sizes and Sparsity from CountVector}
 
-\noindent For this study we used \textbf{CountVectorizer} (\textbf{TfiDf} can also be used, but it did not alter the conclustions of this study).
-When an n-gram is applied to corpus combinatorics diticates a large number of features will be generated and for a given feature, most of the column entries will
-be zero, resulting in extremly sparse matricies.  The table below gives a measure of $\mbox{sparsity} = \frac{non-zero elements}{total elements}$ and 
-the resulting number of elements in each n-gram generated matrix in the billions. In general stacking reduces the sparsity by a factor of 4 and
-the matrix size by a factor of 5. The L1 matrix norm for all of the matricies ranged between 1200 to 1600.\\
+\noindent For this study we used term frequencies generated from \textbf{CountVectorizer} (\textbf{TfiDf} can also be used, but it did not alter the conclusions of this study).  When an n-gram is applied to a corpus of documents $D$, one can deduce from basic combinatorics that a large number of features will be generated from various mixtures of case studies.  \vertSpace
+
+As we mentioned in our introduction, the classic problem with NLP bag-of-words models is that most of the column entries (n-grams) are zero, resulting in extremly sparse matricies.  The table below gives a measure of $\mbox{sparsity} = \frac{non-zero elements}{total elements}$ and the resulting number of elements in each n-gram generated matrix (units are in billions).  We empirically observed that the ``stacked'' model reduces the sparsity by a factor of four and the matrix size by a factor of five. The L1 matrix norm for all of the matricies ranged between 1200 to 1600.\\
 
 \noindent \begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}|  }
  \hline
