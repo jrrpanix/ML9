@@ -59,7 +59,9 @@ def ParameterImpact(d1):
 
 def showOrSave(output=None):
     if output is not None:
-        plt.savefig("{}.pdf".format(output), bbox_inches='tight')
+        #plt.savefig("{}.pdf".format(output), bbox_inches='tight')
+        #plt.savefig("{}.jpg".format(output), bbox_inches='tight', rasterized=True, dpi=80)
+        plt.savefig("{}.pdf".format(output), bbox_inches='tight', rasterized=True, dpi=50)
     else:
         plt.show()
     
@@ -329,7 +331,87 @@ def table2(f1, output=None, f2=None):
                    dxns.iloc[j].F1, min(dxns.iloc[j].NonZeroCoeff, 1.0),
                    dxs.iloc[j].F1, min(dxs.iloc[j].NonZeroCoeff, 1.0)))
                   
-    
+
+def table3(f1, output=None, f2=None, limit=None, ngramON=True, plot=True):
+    # python ./analysis.py -i ../output/sparse.csv -r table3 -o ngramlen_nb_ll
+    limit = limit if limit is not None else 1e12
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    d1 = d1[d1["Stack"] == False]
+    colC(d1)
+    models = d1["Model Name"].unique()
+    keep = ["Logistic Lasso500.0","Logistic Lasso1.0","MultiNB0.0"]
+    keep = ["Logistic Lasso1.0","MultiNB0.0"]
+    dm = pd.concat([d1[d1["Model Name"] == m] for m in keep])
+    ngram = dm[dm["Model Name"] == "MultiNB0.0"].NGram.unique()
+    scores = []
+    for n in ngram:
+        dn = dm[dm["NGram"] == n]
+        if len(dn) != 3 : continue
+        fv = [dn[dn["Model Name"] == model].iloc[0].F1 for model in keep]
+        fv.append(dn[dn["Model Name"] == keep[-1]].iloc[0].sparcity)
+        fv.append(int(n.split(':')[-1]))
+        scores.append(fv)
+    scores = sorted(scores , key = lambda x : x[-2], reverse=False)
+    for s in scores:
+        sp = s[-2]
+        if sp > limit : break
+        print ("%3d& %8.6f & %5.3f & %5.3f & %5.3f\\\\" % ( s[-1], s[-2], s[2], s[0], s[1]))
+
+    if not plot : return
+    for m in models:
+        if not m in keep : continue
+        dm = d1[d1["Model Name"] == m]
+        f1, sz, ng = dm.F1.values, dm.sparcity.values, dm.NGram.values
+        ngv = [int(n.split(':')[1]) for n in ng]
+        if ngramON:
+            combo = sorted([(ngv[i], f1[i]) for i in range(len(f1))], key = lambda x : x[0])
+        else:
+            combo = sorted([(sz[i], f1[i]) for i in range(len(f1))], key = lambda x : x[0])
+        x = [c[0] for c in combo if c[0] < limit]
+        y = [c[1] for c in combo if c[0] < limit]
+        for i in range(len(x)):
+            print("%s & %8.5f & %5.3f \\" % (m, x[i], y[i]))
+        if len(x) == 0 : continue
+        plt.plot(x,y, marker='o', label=m)
+    if ngramON:
+        plt.xlabel("N-Gram Length")
+    else:
+        plt.xlabel("Sparcity")
+    plt.ylabel("F1 Score")
+    plt.title("Unstacked comparison of NB and LL")
+    #plt.title("Sparcity vs F1 Score")
+    plt.legend()
+    showOrSave(output)
+
+def table4(f1, output=None, f2=None, limit=None, ngramON=True, plot=True):
+    limit = limit if limit is not None else 1e12
+    d1 = pd.read_csv(f1)
+    if f2 is not None:
+        d2 = pd.read_csv(f2)
+        d1 = d1.append(d2)
+    d1 = d1[d1["Stack"] == True]
+    keep = ["Logistic Lasso1.0","Logistic Lasso50.0","Logistic Lasso500.0","MultiNB0.0"]
+    modelLabel = ["LL a=1.0","LL a=0.02","LL a=0.002","Naive Bayes"]
+    skip = ["5:5","6:6","8:8","10:10","12:12"]
+    for ix,model in enumerate(keep):
+        dm = d1[d1["Model Name"] == model]
+        if len(dm) == 0 : continue
+        ng = dm.NGram.values
+        f1 = dm.F1.values
+        data = sorted([(ng[i], f1[i]) for i in range(len(ng)) if ng[i] not in skip], key = lambda x : 10*int(x[0].split(':')[0])+int(x[0].split(':')[-1]))
+        x = np.arange(len(data))
+        xl = [d[0] for d in data]
+        y = [d[1] for d in data]
+        plt.plot(x, y, label=modelLabel[ix])
+        plt.xticks(x, xl)
+    plt.xlabel("N-gram sequence")
+    plt.ylabel("F1 Score")
+    plt.title("Impact of F1 on various N-gram sequences")
+    plt.legend()
+    showOrSave(output)
 
 if __name__ == '__main__':
     # to get bar graph of matrix sizes
@@ -386,3 +468,7 @@ if __name__ == '__main__':
         createTable(f1, args.output, f2)
     elif args.run == 'table2':
         table2(f1, args.output, f2)
+    elif args.run == 'table3':
+        table3(f1, args.output, f2, args.limit)
+    elif args.run == 'table4':
+        table4(f1, args.output, f2, args.limit)
