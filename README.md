@@ -3,9 +3,9 @@
 ###### John Reynolds and Jeremy Lao
 
 #### writeups
-1 in ./presentation
-1. MLPaper.pdf - paper submitted for the class
-2. MLPaper.txt - latex version
+1. ./presentation
+2. MLPaper.pdf - paper submitted for the class
+3. MLPaper.txt - latex version
 
 #### code
 1. code in /src
