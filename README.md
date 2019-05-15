@@ -1,8 +1,10 @@
 # ML9
 ### Machine Learning NYU Spring 2019 
-### John Reynolds and Jeremy Lao
+###### John Reynolds and Jeremy Lao
 
-## Paper for this study is in 
+1. Code in src
+  - 
+
 Observations from testing: 
   1.    Ngrams (bigrams and trigrams) increase the accuracy 
   2.    Logistic lasso performs the best
